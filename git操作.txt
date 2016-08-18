@@ -1,0 +1,31 @@
+install:
+	sudo apt-get install git
+	git config --global user.name  "YourName"
+	it config --global user.email "your@email.com"
+	ssh-keygen -t rsa -C "your@email.com"
+	
+git:
+	git clone git@github.com:EnterTech/NapTime-Server.git
+	
+	git remote add origin git@github.com:EnterTech/NapTime-Server.git
+	
+	git reset --hard FETCH_HEAD	//放弃本地的文件修改
+	git checkout test/AccountTest.java	//放弃指定文件的修改（与本地库保持一致）
+	 
+	git fetch origin master	//与git保持同步
+	git merge origin/master
+	
+	git pull origin master
+	
+	git add xx.java	//添加要跟踪的文件
+	git add . -A	//添加所有
+	
+	git commit -m "添加项目密钥配置文件"
+	git push
+	
+	git tag -a v0.1.1 9fbc3d0	//给 9fbc3d0 的commit打标签 v0.1.1
+	git push origin v0.1.2	//将标签 v0.1.2 上传到git
+	
+	git@github.com:EnterTech/NapTime-Server.git
+	
+	参考： http://www.runoob.com/git/git-create-repository.html
