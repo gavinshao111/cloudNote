@@ -5,4 +5,4 @@
 实现1：https://github.com/eclipse/paho.mqtt.c
  缺点可能需要安装cmake等其他软件，比较麻烦。优点，readme文档写的详细。
 实现2：https://github.com/eclipse/paho.mqtt.cpp
-  缺点：无readme文档。
+ 优点：可能可以直接使用makefile编译。缺点：无readme文档。
