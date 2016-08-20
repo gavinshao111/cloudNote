@@ -3,6 +3,10 @@
 在服务器上部署 mqtt 客户端
 
 实现1：https://github.com/eclipse/paho.mqtt.c
- 缺点可能需要安装cmake等其他软件，比较麻烦。优点，readme文档写的详细。
+ 包含预编译版本（即已生成lib，直接调用即可)和源文件版本（需要build）。
+ 文档：https://www.eclipse.org/paho/clients/c/
 实现2：https://github.com/eclipse/paho.mqtt.cpp
+ 文档：https://www.eclipse.org/paho/clients/cpp/
+ 需要eclipse.paho.client.c的lib
  优点：可能可以直接使用makefile编译。缺点：无readme文档。
+mqtt client for Qt: https://github.com/emqtt/qmqtt
