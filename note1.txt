@@ -11,3 +11,5 @@
  需要eclipse.paho.client.c的lib
  优点：可能可以直接使用makefile编译。缺点：无readme文档。
 mqtt client for Qt: https://github.com/emqtt/qmqtt
+
+模型学习 http://topmanopensource.iteye.com/blog/1699408
