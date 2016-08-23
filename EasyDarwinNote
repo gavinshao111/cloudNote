@@ -1,0 +1,15 @@
+查看端口占用情况：
+lsof -i :port_number |grep "(LISTEN)"
+
+参考[EasyDarwin官方文档](https://github.com/EasyDarwin/EasyDarwin/blob/master/EasyDarwin/README.md) 
+编译，修改配置文件然后运行，都没问题。
+然后安装vlc客户端测试，访问easyDarwin进行mp4点播，无法播放，因为测试的mp4文件需要被Hint处理过才行。
+然后安装[mp4box](https://gpac.wp.mines-telecom.fr/downloads/gpac-nightly-builds/)来进行hint处理。
+安装完以后运行 
+
+mp4box filename -hint
+
+然后vlc点播mp4成功。
+
+推流模式:
+mp4点播模式的时候，vlc客户端访问 rtsp_port 进行点播。而在推流模式下，直播方将视频数据上传到rtsp_port端口，easyDarwin生成dsp文件，然后vlc客户端访问 rtsp://[ip]:[rtsp_port]/abc.sdp 播放视频。
