@@ -13,3 +13,9 @@ mp4box filename -hint
 
 推流模式:
 mp4点播模式的时候，vlc客户端访问 rtsp_port 进行点播。而在推流模式下，直播方将视频数据上传到rtsp_port端口，easyDarwin生成dsp文件，然后vlc客户端访问 rtsp://[ip]:[rtsp_port]/abc.sdp 播放视频。
+
+2016/08/25 19:32
+今天能安心下班了。
+
+之前的任务是，当APP端发送直播的RTSP请求到EasyDarwin服务器时，服务器要识别这个请求是否为直播请求，即请求的url结尾是否为 .sdp。
+是则将
