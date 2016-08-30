@@ -1,0 +1,60 @@
+share folder: \\10.30.16.110\D-UserFiles
+Z: ftp://10.26.201.100
+connect to internet: 
+	C:\Users\10256\AppData\Roaming\Microsoft\Workspaces\{19FFE2FD-0D78-4EF9-8B43-9F84E9763A43}\Resource\Google Chrome (Work Resources).rdp
+初始密码: P@dahua2016
+服务器 10.30.16.216 shao_guofeng shaoguofeng
+alicloud shao_guofeng@120.27.188.84 shao_guofeng123
+ubuntu with MQ server 172.17.4.9 / 192.168.43.201
+    panzhao 111111
+建立映射
+
+rtsp://10.30.16.216:8181/api/getrtsppushsessions
+rtsp://10.30.16.216:8888/test.mp4
+
+easydarwin:
+export LD_LIBRARY_PATH="/home/panzhao/EasyDarwin/mqtt.c/lib"
+
+
+
+
+我们把所有的库文件放到 /home/panzhao/mqtt_client/lib ，并把 /home/panzhao/mqtt_client/lib 放入 LD_LIBRARY_PATH.
+头文件位置不变，在编译时用 -I 参数包含进去。
+export MQ_CLI="/home/panzhao/mqtt_client"
+cd ${MQ_CLI}/MyMqttClient
+g++ MQTTClient_publish.cpp -L../mqtt.c/lib -lpaho-mqtt3c -o publish
+g++ MQTTClient_subscribe.cpp -L../mqtt.c/lib -lpaho-mqtt3c -o subscribe
+//设置 LD_LIBRARY_PATH 以载入共享库
+export LD_LIBRARY_PATH="/home/panzhao/mqtt_client/mqtt.c/lib"
+
+
+mqtt.cpp
+src/mqtt 为头文件目录
+cd ${MQ_CLI}/mqtt.cpp/
+g++ -fpic -shared src/*.cpp -Isrc/ -I../mqtt.c/include/ -L${MQ_CLI}/lib -lpaho-mqtt3c -pthread -std=c++11 -o ../lib/libmqttpp.so > build2.log 2>&1
+many errors...
+
+
+g++ async_publish.cpp -I/home/panzhao/mqtt_client/mqtt.cpp/src/mqtt
+
+
+cd ${MQ_CLI}/test/
+
+g++ main.cpp -I../mqtt.c/include/ -I../mqtt.cpp/src/ -std=c++11
+
+
+部署 EasyDarwin:
+1. 将mqtt头文件和lib放到EasyDarwin文件目录下，添加库文件目录到 LD_LIBRARY_PATH
+2. 在项目->c++编译器包含目录中中添加mqtt头文件目录，
+3. 在链接器其他库目录中添加qmqtt库所在目录，编译行其他选项中添加 -lpaho-mqtt3a -lpaho-mqtt3as -lpaho-mqtt3c -lpaho-mqtt3cs -DNO_PERSISTENCE=1
+4. 写EasyDarwin源代码基础上写代码。
+
+EasyDarwin 配置文件中的当前目录为启动easyDarwin的目录，若在x64下启动，则xml文件中的 . =.../x64/
+./x64/easydarwin -c WinNTSupport/easydarwin.xml -d
+
+
+编译 MyMQTTClient_...
+g++ MQTTClient_subscribe.cpp -I ../EasyDarwin/mqtt.c/include/ -L ../EasyDarwin/mqtt.c/lib -lpaho-mqtt3a -lpaho-mqtt3as -lpaho-mqtt3c -lpaho-mqtt3cs -DNO_PERSISTENCE=1 -o subscribe
+
+
+du -h --max-depth=1 . 显示文件夹大小
