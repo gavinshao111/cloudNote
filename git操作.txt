@@ -1,8 +1,10 @@
 install:
 	sudo apt-get install git
 	git config --global user.name  "YourName"
-	it config --global user.email "your@email.com"
+	gait config --global user.email "your@email.com"
+	
 	ssh-keygen -t rsa -C "your@email.com"
+	ssh -T git@github.com //to test if work.
 	
 git:
 	git clone git@github.com:EnterTech/NapTime-Server.git
@@ -25,6 +27,7 @@ git:
 	git commit -m "添加项目密钥配置文件"
 	git push
 	
+		
 	git tag -a v0.1.1 9fbc3d0	//给 9fbc3d0 的commit打标签 v0.1.1
 	git push origin v0.1.2	//将标签 v0.1.2 上传到git
 	
