@@ -4,7 +4,7 @@ connect to internet:
 	C:\Users\10256\AppData\Roaming\Microsoft\Workspaces\{19FFE2FD-0D78-4EF9-8B43-9F84E9763A43}\Resource\Google Chrome (Work Resources).rdp
 初始密码: P@dahua2016
 服务器 10.30.16.216 shao_guofeng shaoguofeng
-alicloud shao_guofeng@120.27.188.84 shao_guo****123
+alicloud shao_guofeng@120.27.188.84 shao_guofeng123
 ubuntu with MQ server 172.17.4.9 / 192.168.43.201
     panzhao 111111
 建立映射
@@ -14,6 +14,7 @@ rtsp://10.30.16.216:8888/test.mp4
 
 easydarwin:
 export LD_LIBRARY_PATH="/home/panzhao/EasyDarwin/mqtt.c/lib"
+
 
 
 
@@ -43,10 +44,14 @@ cd ${MQ_CLI}/test/
 g++ main.cpp -I../mqtt.c/include/ -I../mqtt.cpp/src/ -std=c++11
 
 
+MqForEasyD:
+g++ strlfunc.cpp mainProcess.cpp -fpic -shared -I ../mqtt.c/include/ -L ../mqtt.c/lib -lpaho-mqtt3a -lpaho-mqtt3as -lpaho-mqtt3c -lpaho-mqtt3cs -DNO_PERSISTENCE=1 -o dist/Release/GNU-Linux/libMqForEasyD.so
+
+
 部署 EasyDarwin:
 1. 将mqtt头文件和lib放到EasyDarwin文件目录下，添加库文件目录到 LD_LIBRARY_PATH
 2. 在项目->c++编译器包含目录中中添加mqtt头文件目录，
-3. 在链接器其他库目录中添加qmqtt库所在目录，编译行其他选项中添加 -lpaho-mqtt3a -lpaho-mqtt3as -lpaho-mqtt3c -lpaho-mqtt3cs -DNO_PERSISTENCE=1
+3. 在链接器其他库目录中添加qmqtt库所在目录，编译行其他选项中添加 -lpaho-mqtt3a -lpaho-mqtt3as -lpaho-mqtt3c -lpaho-mqtt3cs -DNO_PERSISTENCE=1 -lMqForEasyD
 4. 写EasyDarwin源代码基础上写代码。
 
 EasyDarwin 配置文件中的当前目录为启动easyDarwin的目录，若在x64下启动，则xml文件中的 . =.../x64/
