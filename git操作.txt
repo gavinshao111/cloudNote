@@ -9,6 +9,8 @@ git:
 	
 	git remote add origin git@github.com:EnterTech/NapTime-Server.git
 	
+    git rm --cached File_name //放弃跟踪某文件 -r 放弃跟踪文件夹
+    
 	git reset --hard FETCH_HEAD	//放弃本地的文件修改
 	git checkout test/AccountTest.java	//放弃指定文件的修改（与本地库保持一致）
 	 
