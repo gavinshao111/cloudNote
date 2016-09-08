@@ -3,9 +3,10 @@ Z: ftp://10.26.201.100
 connect to internet: 
 	C:\Users\10256\AppData\Roaming\Microsoft\Workspaces\{19FFE2FD-0D78-4EF9-8B43-9F84E9763A43}\Resource\Google Chrome (Work Resources).rdp
 初始密码: P@dahua2016
-服务器 10.30.16.216 shao_guofeng shaoguofeng
-alicloud shao_guofeng@120.27.188.84 shao_guofeng123
-ubuntu with MQ server 172.17.4.9 / 192.168.43.201
+编译服务器 10.30.16.216 shao_guofeng shaoguofeng
+alicloud shao_guofeng@120.27.188.84 shao_guofeng123 2798abc
+
+panzhao: 172.17.4.9 / 192.168.43.201  (61.130.183.8)
     panzhao 111111
 建立映射
 
@@ -14,7 +15,6 @@ rtsp://10.30.16.216:8888/test.mp4
 
 easydarwin:
 export LD_LIBRARY_PATH="/home/panzhao/EasyDarwin/mqtt.c/lib"
-
 
 
 
