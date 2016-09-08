@@ -9,7 +9,7 @@ install:
 git:
 	git clone git@github.com:EnterTech/NapTime-Server.git
 	
-	git remote add origin git@github.com:EnterTech/NapTime-Server.git
+	git remote add origin git@github.com:gavinshao111/EasyDarwin.git
 	
 	git ls-files //列出已跟踪文件
     git rm --cached File_name //放弃跟踪某文件 -r 放弃跟踪文件夹
@@ -35,5 +35,7 @@ git:
 	git push origin v0.1.2	//将标签 v0.1.2 上传到git
 	
 	git@github.com:EnterTech/NapTime-Server.git
+	
+	git rm -r --cached ffmTest/\* //删除仓库内 ffmTest/ 所有文件
 	
 	参考： http://www.runoob.com/git/git-create-repository.html
