@@ -45,7 +45,7 @@ g++ main.cpp -I../mqtt.c/include/ -I../mqtt.cpp/src/ -std=c++11
 
 
 MqForEasyD:
-g++ strlfunc.cpp mainProcess.cpp -fpic -shared -I ../mqtt.c/include/ -L ../mqtt.c/lib -lpaho-mqtt3a -lpaho-mqtt3as -lpaho-mqtt3c -lpaho-mqtt3cs -DNO_PERSISTENCE=1 -o dist/Release/GNU-Linux/libMqForEasyD.so
+g++ strlfunc.cpp mainProcess.cpp -fpic -shared -I ../mqtt.c/include/ -L ../mqtt.c/lib -lpaho-mqtt3c -DNO_PERSISTENCE=1 -o dist/Release/GNU-Linux/libMqForEasyD.so
 
 
 部署 EasyDarwin:
