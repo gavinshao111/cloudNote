@@ -1,0 +1,54 @@
+服务安装
+1.
+	sudo apt-get install nfs-kernel-server
+2.安装成功会出现配置文件/etc/exports
+	ls /etc/exports
+	
+	
+3.配置启动nfs服务，指定共享目录
+	指定所要共享的目录	*(rw,sync,no_root_squash)
+	e.g.
+	/home/shao/nfsroot *(rw,sync,no_root_squash)	//允许所有网段连接
+	/home/shao/nfsroot 192.168.1.1(rw,sync,no_root_squash)	//允许 192.168.1.1 连接
+
+4.重启nfs服务
+sudo service nfs-kernel-server restart
+
+客户端接入：
+1. 安装 nfs-common
+	sudo apt-get install 192.168.1.1
+2.挂载服务器的共享目录到本地目录
+sudo mount -t nfs 120.27.188.84:/home/shao_guofeng/nfsRoot ./
+
+若出现
+	mount.nfs: access denied by server while mounting ...
+的错误，服务器端输入 cat /var/log/messages | grep mount 可以看到 	
+refused mount request from 61.130.183.8 for /home/shao_guofeng/nfsRoot (/home/shao_guofeng/nfsRoot): illegal port 27375
+端口号大于1024需要在 /etc/exports 加入 insecure 选项:
+/home/shao_guofeng/nfsRoot *(insecure,rw,sync,no_root_squash)
+
+
+
+
+
+
+1.	在ubuntu安装samba服务sudo apt-get install samba
+
+2. 修改配置文件 /etc/samba/smb.conf
+末尾添加：
+[shao]
+    guest account = shao
+    writeable = yes
+    path = /home/shao/sty
+	
+
+3.	添加用户
+sudo smbpasswd -a shao 
+
+4.	重启samba服务
+sudo service smbd restart
+
+5.	在windows中访问：
+\\ubuntu地址\共享名
+e.g.
+\\192.168.1.122\shao
