@@ -10,38 +10,9 @@ panzhao: 172.17.4.9 / 192.168.43.201  (61.130.183.8)
     panzhao 111111
 建立映射
 
-rtsp://10.30.16.216:8181/api/getrtsppushsessions
-rtsp://10.30.16.216:8888/test.mp4
 
-easydarwin:
-export LD_LIBRARY_PATH="/home/panzhao/EasyDarwin/mqtt.c/lib"
-
-
-
-
-我们把所有的库文件放到 /home/panzhao/mqtt_client/lib ，并把 /home/panzhao/mqtt_client/lib 放入 LD_LIBRARY_PATH.
-头文件位置不变，在编译时用 -I 参数包含进去。
-export MQ_CLI="/home/panzhao/mqtt_client"
-cd ${MQ_CLI}/MyMqttClient
-g++ MQTTClient_publish.cpp -L../mqtt.c/lib -lpaho-mqtt3c -o publish
-g++ MQTTClient_subscribe.cpp -L../mqtt.c/lib -lpaho-mqtt3c -o subscribe
 //设置 LD_LIBRARY_PATH 以载入共享库
 export LD_LIBRARY_PATH="/home/panzhao/mqtt_client/mqtt.c/lib"
-
-
-mqtt.cpp
-src/mqtt 为头文件目录
-cd ${MQ_CLI}/mqtt.cpp/
-g++ -fpic -shared src/*.cpp -Isrc/ -I../mqtt.c/include/ -L${MQ_CLI}/lib -lpaho-mqtt3c -pthread -std=c++11 -o ../lib/libmqttpp.so > build2.log 2>&1
-many errors...
-
-
-g++ async_publish.cpp -I/home/panzhao/mqtt_client/mqtt.cpp/src/mqtt
-
-
-cd ${MQ_CLI}/test/
-
-g++ main.cpp -I../mqtt.c/include/ -I../mqtt.cpp/src/ -std=c++11
 
 
 MqForEasyD:
