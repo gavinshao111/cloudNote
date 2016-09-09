@@ -8,7 +8,8 @@ alicloud shao_guofeng@120.27.188.84 shao_guofeng123 2798abc
 
 panzhao: 172.17.4.9 / 192.168.43.201  (61.130.183.8)
     panzhao 111111
-建立映射
+
+MQ Server in AliCloud: port: 8883, username: easydarwin, passwd: 123456
 
 
 //设置 LD_LIBRARY_PATH 以载入共享库
