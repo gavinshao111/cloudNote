@@ -35,3 +35,9 @@ g++ MQTTClient_subscribe.cpp -I ../EasyDarwin/mqtt.c/include/ -L ../EasyDarwin/m
 
 
 du -h --max-depth=1 . 显示文件夹大小
+
+
+
+compile mqtt.c:
+cmake -GNinja -DPAHO_WITH_SSL=TRUE -DCMAKE_BUILD_TYPE=Debug /home/panzhao/mqtt_client/mqtt.c.sourceCode/paho.mqtt.c
+ninja package
