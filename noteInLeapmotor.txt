@@ -39,5 +39,18 @@ du -h --max-depth=1 . 显示文件夹大小
 
 
 compile mqtt.c:
-cmake -GNinja -DPAHO_WITH_SSL=TRUE -DCMAKE_BUILD_TYPE=Debug /home/panzhao/mqtt_client/mqtt.c.sourceCode/paho.mqtt.c
+cd /home/panzhao/mqtt_client/EasyDarwin/mqtt.c/2ndbuild/
+cmake -GNinja -DPAHO_WITH_SSL=1 -DCMAKE_BUILD_TYPE=Debug OPENSSL_INC_SEARCH_PATH="/home/panzhao/mqtt_client/openssl/include" OPENSSL_LIB_SEARCH_PATH=/home/panzhao/mqtt_client/openssl/lib /home/panzhao/mqtt_client/mqtt.c.sourceCode/paho.mqtt.c
 ninja package
+
+MQ 服务器 公钥 crt 转 pem:
+openssl x509 -in mycert.crt -out mycert.pem -outform PEM
+
+生成私钥:
+openssl genrsa -des3 -out privkey.pem 2048
+
+
+
+
+cd mqtt.c.sourceCode/paho.mqtt.c
+make 生成 含SSL和可调试的库文件
