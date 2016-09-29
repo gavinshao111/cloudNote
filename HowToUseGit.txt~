@@ -11,7 +11,6 @@ git:
 	git ls-files 查看仓库文件
 	git status -s 查看当前文件修改状态(-s simple)
 
-	删除
     git rm --cached File_name //放弃跟踪某文件 -r 放弃跟踪文件夹
     git rm -r --cached path/ //放弃path下所有文件的跟踪。
     --cached 删除index中的文件，即已添加但未提交。若不加则删除仓库内文件，并会删除本地文件。
