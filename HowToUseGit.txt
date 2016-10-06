@@ -3,7 +3,8 @@ install:
 	git config --global user.name  "gavinshao111"
 	git config --global user.email "yiyecheer@163.com"
 	
-	ssh-keygen -t rsa -C "your@email.com"
+	ssh-keygen -t rsa -C "yiyecheer@163.com"
+	// then upload your public key in guthub.
 	ssh -T git@github.com //to test if work.
 	
 git:
@@ -42,10 +43,10 @@ git:
 	
 	git commit -m "添加项目密钥配置文件"
 	git push
-	
+	git push origin branch-name --force //本地覆盖远程
 		
 	git tag -a v0.1.1 9fbc3d0	//给 9fbc3d0 的commit打标签 v0.1.1
 	git push origin v0.1.2	//将标签 v0.1.2 上传到git
-		
+	
 	
 	参考： http://www.runoob.com/git/git-create-repository.html
