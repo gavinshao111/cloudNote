@@ -59,7 +59,7 @@ make 生成 含SSL和可调试的库文件
 Linux 相关操作:
 开放端口: sudo iptables -I INPUT -p tcp --dport 8888 -j ACCEPT
 du -h --max-depth=1 . 显示文件夹大小
-tcpdump -i eth0 host 10.34.16.180 -w 15_12.cap
+tcpdump -i eth1 host 120.27.188.84 -w 14_51.cap
 
 
 
@@ -74,3 +74,19 @@ OSRef.cpp & OSRef.h:
 	SessionMap类，增加判断某Session是否存在的接口。
 RTSPRequestInterface.cpp
 
+
+同一个session中，若ED处理APP的option时堵塞，ED处理car的推流时也堵在ANNOUNCE，
+因此若要加入条件变量通知机制，需要在ED检测到Car的OPTION时就发送通知。
+
+
+
+ToDo:
+1. 从panzhao拷过来的ffmTest不能用 done
+2. 条件变量 当收到car的option是call notifyAppThePsuhIsArrived
+3. Android tcp 无法播放
+4. mqtt in SSL
+5. parseReq 当收到这样的req时(rtsp://10.34.16.175:8888/testAfterHint.mp4), 解析失败
+
+今天修复了 问题2 和5。在ubuntu上测试时，ED先处理App的option然后堵塞，期间ED会处理car的option announce，但是处理car的setup是在处理app的 option desc之后，这导致第一次必将失败。
+回滚到 版本a 后还是一样，阿里云也是版本a 但是没这个问题。使用未经修改的ED也是这个问题。
+之后将重新用centOS作为测试机。最新的代码版本已备份到分支 backup。
