@@ -77,7 +77,15 @@ RTSPRequestInterface.cpp
 
 同一个session中，若ED处理APP的option时堵塞，ED处理car的推流时也堵在ANNOUNCE，
 因此若要加入条件变量通知机制，需要在ED检测到Car的OPTION时就发送通知。
+此时处理APP Option的线程被唤醒，sleep 0.1s，等车机setup。
 
+app上来发现推流不存在，则注册cond,在车机断开时unRegister,在返回404给app时unRegister
+
+问题：
+电脑vlc测试时，若call send startMQ，则处理Car setup的线程会先处理app的desc，导致播放失败。
+				若加入条件变量等待，不通知让其超时，处理的Car setup的与处理app的desc的不是同一个线程，则ED先处理Car setup再处理app的desc，播放成功
+									若加入通知，即当处理的app option的线程堵塞时，收到car的option唤醒，即使在sleep 2s，ED还是会先处理app的desc，再处理Car setup（同一线程），导致播放失败。
+但是用ios app测试，即使在被唤醒后只sleep 0.1s，也能成功。
 
 
 ToDo:
