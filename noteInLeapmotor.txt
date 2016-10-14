@@ -12,10 +12,6 @@ panzhao: 172.17.4.9 / 192.168.43.201  (61.130.183.8)
 MQ Server in AliCloud: port: 8883, username: easydarwin, passwd: 123456
 
 
-//设置 LD_LIBRARY_PATH 以载入共享库
-export LD_LIBRARY_PATH="/home/panzhao/mqtt_client/mqtt.c/lib"
-
-
 MqForEasyD:
 g++ strlfunc.cpp mainProcess.cpp -fpic -shared -I ../mqtt.c/include/ -L ../mqtt.c/lib -lpaho-mqtt3c -DNO_PERSISTENCE=1 -o dist/Release/GNU-Linux/libMqForEasyD.so
 
@@ -28,12 +24,6 @@ g++ strlfunc.cpp mainProcess.cpp -fpic -shared -I ../mqtt.c/include/ -L ../mqtt.
 
 EasyDarwin 配置文件中的当前目录为启动easyDarwin的目录，若在x64下启动，则xml文件中的 . =.../x64/
 ./x64/easydarwin -c WinNTSupport/easydarwin.xml -d
-
-
-编译 MyMQTTClient_...
-g++ MQTTClient_subscribe.cpp -I ../EasyDarwin/mqtt.c/include/ -L ../EasyDarwin/mqtt.c/lib -lpaho-mqtt3a -lpaho-mqtt3as -lpaho-mqtt3c -lpaho-mqtt3cs -DNO_PERSISTENCE=1 -o subscribe
-
-
 
 
 
@@ -50,29 +40,12 @@ openssl x509 -in mycert.crt -out mycert.pem -outform PEM
 openssl genrsa -des3 -out privkey.pem 2048
 
 
-
-
-cd mqtt.c.sourceCode/paho.mqtt.c
-make 生成 含SSL和可调试的库文件
-
  
 Linux 相关操作:
 开放端口: sudo iptables -I INPUT -p tcp --dport 8888 -j ACCEPT
 du -h --max-depth=1 . 显示文件夹大小
 tcpdump -i eth1 host 120.27.188.84 -w 14_51.cap
 
-
-
-
-RTSPRequestStream.cpp:
-	RTSPRequestStream::ReadRequest: 解析网路数据(OPTION)，解析到则发送MQ。
-ReflectorSession.cpp:
-	ReflectorSession::RemoveOutput: 判断Session内没有APP时发送StopPushMQ
-QTSSReflectorModule.cpp:
-	维护SessionMap，包括当有推流时创建Session，判断某Session是否存在。
-OSRef.cpp & OSRef.h:
-	SessionMap类，增加判断某Session是否存在的接口。
-RTSPRequestInterface.cpp
 
 
 同一个session中，若ED处理APP的option时堵塞，ED处理car的推流时也堵在ANNOUNCE，
@@ -82,19 +55,7 @@ RTSPRequestInterface.cpp
 app上来发现推流不存在，则注册cond,在车机断开时unRegister,在返回404给app时unRegister
 
 问题：
-电脑vlc测试时，若call send startMQ，则处理Car setup的线程会先处理app的desc，导致播放失败。
-				若加入条件变量等待，不通知让其超时，处理的Car setup的与处理app的desc的不是同一个线程，则ED先处理Car setup再处理app的desc，播放成功
-									若加入通知，即当处理的app option的线程堵塞时，收到car的option唤醒，即使在sleep 2s，ED还是会先处理app的desc，再处理Car setup（同一线程），导致播放失败。
-但是用ios app测试，即使在被唤醒后只sleep 0.1s，也能成功。
 
 
 ToDo:
-1. 从panzhao拷过来的ffmTest不能用 done
-2. 条件变量 当收到car的option是call notifyAppThePsuhIsArrived
 3. Android tcp 无法播放
-4. mqtt in SSL
-5. parseReq 当收到这样的req时(rtsp://10.34.16.175:8888/testAfterHint.mp4), 解析失败
-
-今天修复了 问题2 和5。在ubuntu上测试时，ED先处理App的option然后堵塞，期间ED会处理car的option announce，但是处理car的setup是在处理app的 option desc之后，这导致第一次必将失败。
-回滚到 版本a 后还是一样，阿里云也是版本a 但是没这个问题。使用未经修改的ED也是这个问题。
-之后将重新用centOS作为测试机。最新的代码版本已备份到分支 backup。
