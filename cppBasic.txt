@@ -1,0 +1,3 @@
+A 继承与 B
+void func(B* b);
+func 中传入A类型的指针，编译通过。
