@@ -1,0 +1,40 @@
+1. 类的大小
+class A{
+public:
+  A(){}
+  ~A(){}
+    void print(){}
+    virtual void func(){}
+    virtual void func2(){}
+private:
+    int a;
+};
+64位系统上 sizeof(A) = ?
+
+2. C语言标准库函数 strcpy 有什么漏洞，如何避免？
+
+3. 实现 string 类
+
+4. 静态库跟动态库的区别
+
+5. 类的多态如何体现：
+编译时多态：重载 模板。运行时多态：虚函数
+
+6. vector与list的优劣
+vector访问高效，list插入元素高效
+当vector内存不足时，会申请原size两倍的size，并把原数据拷贝。
+
+7. 类的静态成员变量何时被初始化，有什么作用
+在编译时分配内存并初始化。属于类不属于对象，可以用来统计类的信息，如类对象个数。
+
+8. 
+64位系统上
+int a;
+char *p = "hello";
+sizeof(a) = ?
+sizeof(&a) = ?
+sizeof(p) = ?
+sizeof(*p) = ?
+strlen(p) = ?
+
+9. 
