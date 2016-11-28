@@ -2,19 +2,16 @@
 file -Lz * | grep ASCII | cut -d":" -f1 | xargs ls -ltr
 
 
-# å¼€æ”¾ç«¯å£: 
+# ¿ª·Å¶Ë¿Ú: 
 sudo iptables -I INPUT -p tcp --dport 8888 -j ACCEPT
-# æ˜¾ç¤ºæ–‡ä»¶å¤¹å¤§å°
+# ÏÔÊ¾ÎÄ¼ş¼Ğ´óĞ¡
 du -h --max-depth=1 . 
 
 tcpdump -i eth0 host 10.34.16.180 -w 15_12.cap
 
 
-# MQ æœåŠ¡å™¨ å…¬é’¥ crt è½¬ pem:
+# MQ ·şÎñÆ÷ ¹«Ô¿ crt ×ª pem:
 openssl x509 -in mycert.crt -out mycert.pem -outform PEM
 
-# ç”Ÿæˆç§é’¥:
+# Éú³ÉË½Ô¿:
 openssl genrsa -des3 -out privkey.pem 2048
-
-
-
