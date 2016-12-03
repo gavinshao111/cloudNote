@@ -15,3 +15,9 @@ openssl x509 -in mycert.crt -out mycert.pem -outform PEM
 
 # Éú³ÉË½Ô¿:
 openssl genrsa -des3 -out privkey.pem 2048
+
+# zip:
+zip -r myfile.zip ./*
+
+# show process started by gavin
+ps -aux | grep ^gavin
