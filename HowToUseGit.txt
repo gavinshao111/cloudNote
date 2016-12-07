@@ -52,5 +52,10 @@ git:
 	git tag -d v0.1.2 // 删除本地
 	git push origin master :refs/tags/v0.1.2 // 删除远程
 	
+	栈
+	git stash //将当前工作区的改动备份到栈，同时代码恢复到上一次提交
+	git stash list	//显示已备份的栈
+	git stash pop	//恢复到最近一次栈的改动
+	
 	
 	参考： http://www.runoob.com/git/git-create-repository.html
