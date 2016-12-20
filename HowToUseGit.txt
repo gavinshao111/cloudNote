@@ -11,6 +11,11 @@ git:
 	初始化:
 	git clone
 	然后直接 git pull ，会很慢，可以加参数 --depth==1
+	
+	分支
+	git branch branch_name	//创建分支
+	git checkout branch_name	//切换分支
+	
 
 	查看
 	git ls-files 查看仓库文件
@@ -24,14 +29,18 @@ git:
 
 	git clone git@github.com:gavinshao111/EasyDarwin.git
 	
+	git remote rm origin
 	git remote add origin git@github.com:gavinshao111/ED.git
 	
 	git ls-files //列出已跟踪文件
 
 	
+	git reset --soft commit_id	//回退到commit_id，保留源码和index的内容，直接 git commit 就可以提交
 	git reset --hard FETCH_HEAD	//放弃本地的文件修改
 	git reset --hard commit_id	//放弃 commit_id 之后的commit
 	git checkout test/AccountTest.java	//放弃指定文件的修改（与本地库保持一致）
+	
+	git reflog show	//查看所有的操作日志
 	 
 	git fetch origin master	//与git保持同步
 	git merge origin/master

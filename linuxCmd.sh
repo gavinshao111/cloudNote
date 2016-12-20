@@ -7,7 +7,7 @@ sudo iptables -I INPUT -p tcp --dport 8888 -j ACCEPT
 # 显示文件夹大小
 du -h --max-depth=1 . 
 
-tcpdump -i eth0 host 10.34.16.180 -w 15_12.cap
+tcpdump -i eth1 host 10.34.16.127 -w 12_19.cap
 
 
 # MQ 服务器 公钥 crt 转 pem:
@@ -21,3 +21,12 @@ zip -r myfile.zip ./*
 
 # show process started by gavin
 ps -aux | grep ^gavin
+
+
+shell 注意点：通过命令行输入执行与通过.sh脚本执行在转义字符上有所不同，
+如命令行输入
+./out/ffmTest rtsp://10.34.16.127:8888/realtime/$1234/1/realtime.sdp 在程序中就会变成
+./out/ffmTest rtsp://10.34.16.127:8888/realtime/234/1/realtime.sdp 就是因为'$'是特殊符，是变量标识，shell把 $1 当做变量处理。
+如需正确输入，则需要输入 /out/ffmTest rtsp://10.34.16.127:8888/realtime/\$1234/1/realtime.sdp
+\$ 表示这个 $ 无需转义成标量标识符。
+或者将命令保存到 .sh文件，再执行这个脚本文件，也不会把 $ 转义。
