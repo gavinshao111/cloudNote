@@ -20,4 +20,14 @@ done
 #${file%*/} or ${file#/*} 无效
 
 # install apk
-# pm install /sdcard/backup/apps/myrtspclient-1.apk
+pm install /sdcard/backup/apps/myrtspclient-1.apk
+
+#  How Android Studio install and launch a app:
+12/12 09:36:41: Launching app
+$ adb push /home/gavin/project/MyRTSPClient/app/build/outputs/apk/app-debug.apk /data/local/tmp/com.leapmotor.gavin.myrtspclient
+$ adb shell pm install -r "/data/local/tmp/com.leapmotor.gavin.myrtspclient"
+	pkg: /data/local/tmp/com.leapmotor.gavin.myrtspclient
+Success
+
+
+$ adb shell am start -n "com.leapmotor.gavin.myrtspclient/com.leapmotor.gavin.myrtspclient.MainActivity" -a android.intent.action.MAIN -c android.intent.category.LAUNCHER
