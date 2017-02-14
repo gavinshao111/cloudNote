@@ -1,4 +1,4 @@
-# cp /data/*/base.apk to /sdcard/backup/apps/ and rename to *.apk
+# cp /data/*/base.apk to /sdcard/backup/apps/ and# rename to *.apk
 # com.sina.weibo-1/base.apk -> com.sina.weibo-1 -> weibo-1.apk
 
 filelist=`ls */base.apk`
@@ -6,7 +6,7 @@ for file in $filelist
 do
 	tmp=${file%/*}
 	#echo ${file}
-	tmp=${tmp##*.}
+	# tmp=${tmp##*.}
 	#echo ${file}
 	cp -a ${file} /sdcard/backup/apps/${tmp}.apk
 	echo ${tmp}
@@ -20,4 +20,4 @@ done
 #${file%*/} or ${file#/*} 无效
 
 # install apk
-pm install /sdcard/backup/apps/myrtspclient-1.apk
+# pm install /sdcard/backup/apps/myrtspclient-1.apk
