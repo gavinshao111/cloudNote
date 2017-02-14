@@ -1,32 +1,28 @@
-qsort(char *s, int first, int last){
-    if(first < last){
-	int i = first, j = last;
-	char x = s[i];
-	while(i<j){
-	    while(i<j)	//ä»jå¾€å‰æ‰¾æ¯”xå°çš„å€¼
-		if(s[j]<x)
-		    break;
-	    if(i < j){
-		s[i] = s[j];
-		i++;
-	    }
-	    while(i<j)	//ä»iå¾€åæ‰¾æ¯”xå¤§çš„å€¼
-		if(s[i]>x)
-		    break;
-	    if(i < j){
-		s[j] = s[i];
-		j--;
-	    }
-	}
-	s[i] = x;
-	qsort(s,first,i-1);
-	qsort(s,i+1,last);
-	}
+qsort(char *s, int first, int last) {
+    if (first < last) {
+        int i = first, j = last;
+        char x = s[i];
+        while (i < j) {
+            while (i < j && s[j] >= x) //´ÓjÍùÇ°ÕÒ±ÈxĞ¡µÄÖµ
+                j--;
+            if (i < j) {
+                s[i] = s[j];
+                i++;
+            }
+            while (i < j && s[i] < x) //´ÓiÍùºóÕÒ±Èx´óµÄÖµ
+                i++;
+            if (i < j) {
+                s[j] = s[i];
+                j--;
+            }
+        }
+        s[i] = x;
+        qsort(s, first, i - 1);
+        qsort(s, i + 1, last);
     }
-    
 }
 
-int main(void){
-    char p[10]={...}
-    qsort(s,0,9);
+int main(void) {
+    char p[10] = {...}
+    qsort(s, 0, 9);
 }
