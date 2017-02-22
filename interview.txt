@@ -45,3 +45,43 @@ exec usp_StudentByGenderAge '女',50
 一致性：拿转账来说，假设用户A和用户B两者的钱加起来一共是5000，那么不管A和B之间如何转账，转几次账，事务结束后两个用户的钱相加起来应该还得是5000
 分离性：隔离性是当多个用户并发访问数据库时，比如操作同一张表时，数据库为每一个用户开启的事务，不能被其他事务的操作所干扰，多个并发事务之间要相互隔离。
 持久性：一个事务一旦被提交了，那么对数据库中的数据的改变就是永久性的
+
+二叉树：
+结构：
+struct BinaryTreeNode
+{
+    int m_nValue;
+    BinaryTreeNode* m_pLeft;
+    BinaryTreeNode* m_pRight;
+};
+
+求节点个数
+int GetNodeNum(BinaryTreeNode * pRoot)  
+{  
+    if(pRoot == NULL) // 递归出口  
+        return 0;  
+    return GetNodeNum(pRoot->m_pLeft) + GetNodeNum(pRoot->m_pRight) + 1;  
+}
+
+求深度
+int GetDepth(BinaryTreeNode * pRoot)  
+{  
+    if(pRoot == NULL) // 递归出口  
+        return 0;  
+    int depthLeft = GetDepth(pRoot->m_pLeft);  
+    int depthRight = GetDepth(pRoot->m_pRight);  
+    return depthLeft > depthRight ? (depthLeft + 1) : (depthRight + 1);   
+}
+
+前序遍历
+void PreOrderTraverse(BinaryTreeNode * pRoot)  
+{  
+    if(pRoot == NULL)  
+        return;  
+    cout << pRoot->m_nValue << endl; // 访问根节点 
+    PreOrderTraverse(pRoot->m_pLeft); // 前序遍历左子树  
+    PreOrderTraverse(pRoot->m_pRight); // 前序遍历右子树  
+}
+中序就是先遍历左子树，再打印根节点，再访问右子树
+后序就是先遍历左子树，再访问右子树，再打印根节点
+
