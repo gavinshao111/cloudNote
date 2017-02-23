@@ -85,3 +85,40 @@ void PreOrderTraverse(BinaryTreeNode * pRoot)
 中序就是先遍历左子树，再打印根节点，再访问右子树
 后序就是先遍历左子树，再访问右子树，再打印根节点
 
+单例模式：
+懒汉模式：用锁来保证线程安全，但是会影响性能。
+class Singleton
+{
+private:
+    static Singleton* m_instance;
+    Singleton(){}
+public:
+    static Singleton* getInstance();
+};
+
+Singleton* Singleton::getInstance()
+{
+    if(NULL == m_instance)
+    {
+        Lock();//借用其它类来实现，如boost
+        if(NULL == m_instance)
+        {
+            m_instance = new Singleton;
+        }
+        UnLock();
+    }
+    return m_instance;
+}
+饿汉模式：全局定义对象指针，保证只执行一遍
+class A {
+    A() : m_data(0) {};
+    int m_data;
+    static const A* m_instance;
+public:
+    static const A* getInstance() {
+        return m_instance;
+    }
+    void print() const {cout << m_data << endl;}
+};
+
+const A* A::m_instance = new A;
