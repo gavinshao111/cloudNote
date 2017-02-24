@@ -6,6 +6,12 @@
 CREATE INDEX index_name
 ON table_name (column_name)
 
+授权语句
+GRANT { { SELECT | INSERT | UPDATE | DELETE | REFERENCES | TRIGGER }
+[,...] | ALL [ PRIVILEGES ] }
+ON [ TABLE ] tablename [, ...]
+TO { username | GROUP groupname | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+
 存储过程：
 一、存储过程与函数的区别：
 
@@ -122,3 +128,11 @@ public:
 };
 
 const A* A::m_instance = new A;
+
+会计相关：
+恒等式：资产＝负债＋所有者权益＋（收入－费用）
+报表打印内容：
+unit, Market Price, Market Value, Accred interest, cost, book value, unrealised gain/loss, book yield
+美国有很多会计标准，主要有 tax basis, 4th basis,STAT, gaap, management 等，然后算各种值的时候公式也不同，
+也会涉及到货币汇率转换，投资组合持有量转换
+SMF类型有普通普票，优先股，债券，Money Market，repo，swap，fix income
