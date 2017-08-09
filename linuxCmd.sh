@@ -6,8 +6,8 @@ file -Lz * | grep ASCII | cut -d":" -f1 | xargs ls -ltr
 sudo iptables -I INPUT -p tcp --dport 8888 -j ACCEPT
 # 显示文件夹大小
 du -h --max-depth=1 . 
-
-tcpdump -i eth1 host 10.34.16.127 -w 12_19.cap
+# 抓包
+tcpdump -i eth1 host 120.26.86.124 -w 04_12.cap
 
 
 # MQ 服务器 公钥 crt 转 pem:
@@ -30,3 +30,12 @@ shell 注意点：通过命令行输入执行与通过.sh脚本执行在转义字符上有所不同，
 如需正确输入，则需要输入 /out/ffmTest rtsp://10.34.16.127:8888/realtime/\$1234/1/realtime.sdp
 \$ 表示这个 $ 无需转义成标量标识符。
 或者将命令保存到 .sh文件，再执行这个脚本文件，也不会把 $ 转义。
+
+# 解压到 ~
+tar -zxvf *.gz -C ~
+
+# 读取第一行
+sed -n '1,1p' stdout.log
+
+vi打开文件后查看16进制格式
+:%!xxd 

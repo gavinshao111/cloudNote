@@ -3,16 +3,13 @@ VMware License:
 
 share folder: \\10.30.16.110\D-UserFiles
 Z: ftp://10.26.201.100
-connect to internet: 
-	C:\Users\10256\AppData\Roaming\Microsoft\Workspaces\{19FFE2FD-0D78-4EF9-8B43-9F84E9763A43}\Resource\Google Chrome (Work Resources).rdp
 初始密码: P@dahua2016
-编译服务器 10.30.16.216 shao_guofeng shaoguof***
-alicloud shao_guofeng@120.27.188.84 shao_guof***1** 2798a**
-new cloud shao_guofeng@120.26.86.124 shao_guof***
+new cloud shao_guofeng@120.26.86.124 shao_guof*** sudo dvl@svrhls%dnsiSNUd8
+
 
 panzhao: 172.17.4.9 / 192.168.43.201  (61.130.183.8)
     panzhao 111111
-ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 panzhao@172.17.4.9
+
 
 MQ Server in AliCloud: port: 8883, username: easydarwin, passwd: 123456
 
@@ -31,59 +28,13 @@ EasyDarwin 配置文件中的当前目录为启动easyDarwin的目录，若在x6
 ./x64/easydarwin -c WinNTSupport/easydarwin.xml -d
 
 
+svnAddress
 
+leapCloud:
+http://10.30.16.22/svn/Automobile/Electronics/Software/APP/Server/httpServer/Trunk/leapCloud
 
-compile mqtt.c:
-cd /home/panzhao/mqtt_client/EasyDarwin/mqtt.c/2ndbuild/
-cmake -GNinja -DPAHO_WITH_SSL=1 -DCMAKE_BUILD_TYPE=Debug OPENSSL_INC_SEARCH_PATH="/home/panzhao/mqtt_client/openssl/include" OPENSSL_LIB_SEARCH_PATH=/home/panzhao/mqtt_client/openssl/lib /home/panzhao/mqtt_client/mqtt.c.sourceCode/paho.mqtt.c
-ninja package
+http://10.30.16.22/svn/Automobile/Electronics/Software/APP/Server/httpServer/Trunk/carmanager
 
-
-
-<<<<<<< HEAD
-cd mqtt.c.sourceCode/paho.mqtt.c
-make 生成 含SSL和可调试的库文件
-
- 
-
-
-
-
-
-RTSPRequestStream.cpp:
-	RTSPRequestStream::ReadRequest: 解析网路数据(OPTION)，解析到则发送MQ。
-ReflectorSession.cpp:
-	ReflectorSession::RemoveOutput: 判断Session内没有APP时发送StopPushMQ
-QTSSReflectorModule.cpp:
-	维护SessionMap，包括当有推流时创建Session，判断某Session是否存在。
-OSRef.cpp & OSRef.h:
-	SessionMap类，增加判断某Session是否存在的接口。
-RTSPRequestInterface.cpp
-
-=======
-
- 
-Linux 相关操作:
-开放端口: sudo iptables -I INPUT -p tcp --dport 8888 -j ACCEPT
-du -h --max-depth=1 . 显示文件夹大小
-tcpdump -i eth1 host 120.27.188.84 -w 14_51.cap
-
-
-
-同一个session中，若ED处理APP的option时堵塞，ED处理car的推流时也堵在ANNOUNCE，
-因此若要加入条件变量通知机制，需要在ED检测到Car的OPTION时就发送通知。
-此时处理APP Option的线程被唤醒，sleep 0.1s，等车机setup。
-
-app上来发现推流不存在，则注册cond,在车机断开时unRegister,在返回404给app时unRegister
-
-问题：
-
-
-ToDo:
-3. Android tcp 无法播放
->>>>>>> d4198125880200472bad6f40575c403b35e8251a
-
-ToDo:
-服务器close wait问题 参考 http://blog.csdn.net/yu616568/article/details/44677985
-
-test
+中汽国标检查平台 http://47.92.124.250:8080/jeesite/a?login
+username: TT001234
+password: 2
