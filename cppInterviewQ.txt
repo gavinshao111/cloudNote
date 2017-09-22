@@ -10,6 +10,7 @@ private:
     int a;
 };
 64位系统上 sizeof(A) = ?
+ = sizeof(int) + sizeof(虚函数指针) = 16
 
 2. C语言标准库函数 strcpy 有什么漏洞，如何避免？
 

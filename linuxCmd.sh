@@ -6,6 +6,8 @@ file -Lz * | grep ASCII | cut -d":" -f1 | xargs ls -ltr
 sudo iptables -I INPUT -p tcp --dport 8888 -j ACCEPT
 # 显示文件夹大小
 du -h --max-depth=1 . 
+# 查看磁盘空间
+df -h
 # 抓包
 tcpdump -i eth1 host 120.26.86.124 -w 04_12.cap
 
