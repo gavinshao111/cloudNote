@@ -38,3 +38,5 @@ http://10.30.16.22/svn/Automobile/Electronics/Software/APP/Server/httpServer/Tru
 中汽国标检查平台 http://47.92.124.250:8080/jeesite/a?login
 username: TT001234
 password: 2
+
+javah -d jni -classpath D:\new\sdk\platforms\android-23\android.jar;..\..\build\intermediates\classes\debug com.lp.vehicle.JniInterface

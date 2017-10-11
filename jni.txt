@@ -1,0 +1,135 @@
+使用aar库封装c++动态库，并在Android app中使用。
+我们有一个纯c++风格的第三方arm动态库(.so)，因为无法直接在java app中使用，需要将原始so库封装成符合JNI规范的so库（以下简称封装so库），然后才能通过JNI在java app中使用。我的需求并非直接在Android app中使用，而是再封装成Android app能直接使用的jar包或aar包，然后做成Android SDK发布。所以实质是将c++的SDK转换为Android SDK
+
+1. 环境搭建
+安装jdk
+安装Android studio
+下载SDK、NDK
+(添加环境变量)
+
+2. 新建AS工程和AAR Moudle
+a. File -> New -> New Project, 选择add no activity，命名为 JNITest
+b. local.properties中添加ndk路径，如ndk.dir=D\:\\android-ndk-r16-beta1
+c. gradle.properties中添加 android.useDeprecatedNdk=true
+d. File -> New -> New Moudle -> Android Library 命名为ALibrary
+
+3. 在AAR Moudel中生成封装so库和aar包
+a. 在ALibrary的build.gradle的android.defaultConfig中添加
+        ndk {
+            moduleName "clib"
+            stl "stlport_static"
+            ldLibs "log", "z", "m"
+            abiFilters "armeabi-v7a", "x86"
+        }
+其中moduleName为生成的封装so库名字，stl "stlport_static"表示std::stl支持
+
+b. 创建native接口JNIInterface.java
+package com.lp.alibrary;
+/**
+ * Created by 10256 on 2017/9/27.
+ */
+public class JNIInterface {
+    static {
+        System.loadLibrary("clib");	// 与ALibrary.build.gradle.android.defaultConfig.ndk.moduleName的值一致
+    }
+    public native String name();
+}
+然后build项目
+c. 通过javah命令生成符合JNI规范的c++头文件
+打开cmd，cd到ALibrary所在目录，然后运行
+E:\ShareFolder\project\AndroidStudioProjects\JNITest\alibrary>javah -classpath build\intermediates\classes\debug -jni -d src\main\jni com.lp.alibrary.JNIInterface
+比如我项目是在E:\ShareFolder\project\AndroidStudioProjects\JNITest，注意-classpath后面跟的不是.class文件路径，只要写类package所在路径就行，不要在后面添加\com\lp\alibrary，-d告诉.h文件放到哪，最后的目标要写类全路径名
+然后在src\jni下生成了符合JNI规范的.h文件
+然后在jni下新建c++源文件demp.cpp
+
+#include "com_lp_alibrary_JNIInterface.h"
+#include <Android/log.h>
+
+#define TAG "MainActivity"
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO,TAG ,__VA_ARGS__)
+
+/*
+ * Class:     com_lp_alibrary_JNIInterface
+ * Method:    name
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_lp_alibrary_JNIInterface_name
+  (JNIEnv *env, jobject jobj) {
+    LOGI("Java_com_lp_alibrary_JNIInterface_name");
+    return env->NewStringUTF("Hello From JNI!");
+}
+后面我会在这里调用第三方so库
+然后rebuild在生成build/intermediates/ndk/debug/lib下生成封装so库，在build/output/aar下生成aar库
+
+4. 在Android app中使用aar包
+然后可以把这个aar包当成普通的jar文件给别人用了。
+a. 打开任意一个Android app，File -> New Module -> Import .JAR/.AAR Package 然后FileName浏览到刚才生成的.aar文件
+b. File -> Project Structure -> Moudle.app -> Dependencies -> add -> File Moudle -> alibrary-debug
+c. 在MainActivity中使用AAR包中的native接口
+public class MainActivity extends AppCompatActivity {
+
+    public static final String TAG = "MainActivity";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        Log.i(TAG, new JNIInterface().name());
+    }
+}
+然后make && run,控制台里输出
+09-27 19:41:07.915 22781-22781/com.lp.vehicle I/MainActivity: Java_com_lp_alibrary_JNIInterface_name
+09-27 19:41:07.915 22781-22781/com.lp.vehicle I/MainActivity: Hello From JNI!
+大功告成。
+
+有些人可能还在用eclipse开发Android，所以他不认aar包，只认jar包，那么在 alibrary.build.gradle中添加
+task makeJar(type: Copy) {
+    delete 'build/libs/alib.jar'
+    from('build/intermediates/bundles/release/')
+    into('build/libs/')
+    include('classes.jar')
+    rename('classes.jar', 'alib.jar')
+}
+makeJar.dependsOn(build)
+然后打开右侧的Gradle窗口 -> 选中 :alibrary -> Execute gradle task -> Command line 中输入 makeJar。然后看到alibrary\build\libs下生成了alib.jar。在其他项目使用该模块时，将jar包复制到app\libs下，同时要把build/intermediates/bundles/release/jni下的JNI so库复制到app\src\main\jniLibs下，jniLibs不存在则新建。
+
+1. 使用ndk命令编译生成JNI so库
+a. File -> New Module -> Java Library, 命名为jlib, package命令为com.lp.jlib, class命令为JNIInterface
+然后把ALibrary的JNIInterface.java的代码复制过来，更正包名。
+b. 把alibrary/src/main/jni整个文件夹复制到jlib/src/main下，然后更正c++头文件和源文件的函数名，所有的com_lp_alibrary_JNIInterface改为com_lp_jlib_JNIInterface，头文件也要重命名为com_lp_jlib_JNIInterface.h
+c. copy alibrary\build\intermediates\ndk\release\Android.mk to jlib\src\main\jni。alibrary的Android.mk是AS自动生成，拷过来后我们需要更正LOCAL_SRC_FILES和LOCAL_C_INCLUDES，完整如下
+LOCAL_PATH := $(call my-dir)
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := clib
+LOCAL_LDFLAGS := -Wl,--build-id
+LOCAL_LDLIBS := \
+	-llog \
+	-lz \
+	-lm \
+
+LOCAL_SRC_FILES := \
+	E:\ShareFolder\project\AndroidStudioProjects\JNIDemo\jlib\src\main\jni\demo.cpp \
+
+LOCAL_C_INCLUDES += E:\ShareFolder\project\AndroidStudioProjects\JNIDemo\jlib\src\main\jni
+
+include $(BUILD_SHARED_LIBRARY)
+
+d. 现在要使用ndk编译脚本，所以需要将所在路径添加到环境变量Path中，比如我ndk根目录在D:\android-ndk-r16-beta1，则在Path中添加D:\android-ndk-r16-beta1\build，然后就可以在新打开的cmd中使用 ndk-build 命令了。cd to jlib\src\main, then run:
+E:\ShareFolder\project\AndroidStudioProjects\JNIDemo\jlib\src\main>ndk-build NDK_PROJECT_PATH=. NDK_APPLICATION_MK=jni/Android.mk
+输出
+Android NDK: APP_PLATFORM not set. Defaulting to minimum supported version android-14.
+[arm64-v8a] Install        : libclib.so => libs/arm64-v8a/libclib.so
+[armeabi-v7a] Install        : libclib.so => libs/armeabi-v7a/libclib.so
+[x86] Install        : libclib.so => libs/x86/libclib.so
+[x86_64] Install        : libclib.so => libs/x86_64/libclib.so
+然后在jlib/src/main下生成了libs文件夹，以及里面各个cpu架构的JNI so库
+
+e. 然后 Build -> make Moudle jlib生成jar包
+2. 
+
+
+ref:
+http://blog.csdn.net/lincyang/article/details/45971655
+http://blog.dword1511.info/?p=4529

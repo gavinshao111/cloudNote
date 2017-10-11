@@ -70,4 +70,15 @@ int main()
 {
     using namespace std::chrono_literals;
     std::this_thread::sleep_for(2s);
+	std::this_thread::sleep_for(std::chrono::seconds(2));
 }
+
+8. std::fstream
+
+	ifstream ifs("123.log");
+	while(!ifs.eof()) {
+		char buf[128] = {0};
+		ifs.read(buf, 10);
+		cout << "read " << ifs.gcount() << " bytes: " << buf << endl;
+	}
+	ifs.close();
