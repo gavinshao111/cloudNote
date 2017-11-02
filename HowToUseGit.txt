@@ -35,10 +35,11 @@ git:
 	git ls-files //列出已跟踪文件
 
 	
-	git reset --soft commit_id	//回退到commit_id，保留源码和index的内容，直接 git commit 就可以提交
+	git reset --soft ${commit_id}	//回退到commit_id，保留源码和index的内容，直接 git commit 就可以提交
 	git reset --hard FETCH_HEAD	//放弃本地的文件修改
-	git reset --hard commit_id	//放弃 commit_id 之后的commit
-	git checkout test/AccountTest.java	//放弃指定文件的修改（与本地库保持一致）
+	git reset --hard ${commit_id}	//放弃 commit_id 之后的commit
+	git checkout ${commit_id} /path/to/file // 回退某文件到某次提交
+	git checkout /path/to/file	//放弃指定文件的修改（与本地库保持一致）
 	
 	git reflog show	//查看所有的操作日志
 	 
