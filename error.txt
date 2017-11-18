@@ -1,0 +1,7 @@
+1. 编译一个使用静态库libbytebuffer.a的动态库：
+g++ -DX86_APP    -o ../../AndroidStudioProjects/Jnitest/app/src/main/cpp/libs/GNU-Linux/libnative-lib.so build/Debug/GNU-Linux/_ext/8e8acbce/native-lib.o build/Debug/GNU-Linux/_ext/719b5023/ConfOperator.o build/Debug/GNU-Linux/_ext/719b5023/device.o build/Debug/GNU-Linux/_ext/719b5023/device_info.o build/Debug/GNU-Linux/_ext/719b5023/device_manage.o build/Debug/GNU-Linux/_ext/719b5023/device_media.o build/Debug/GNU-Linux/_ext/719b5023/realtime_stream.o build/Debug/GNU-Linux/_ext/719b5023/util.o -L../../GavinLib/libs -lbytebuffer -lLcDevProtocol -shared -fPIC
+/usr/bin/ld: ../../GavinLib/libs/libbytebuffer.a(ByteBuffer.o): relocation R_X86_64_32 against `_ZTVN7bytebuf10ByteBufferE' can not be used when making a shared object; recompile with -fPIC
+../../GavinLib/libs/libbytebuffer.a: could not read symbols: Bad value
+collect2: error: ld returned 1 exit status
+
+A: 解决的办法是在编译libx.a时加上“-fPIC”参数，这是一个编译期参数，很少人可能误以为只有共享库才使用到，实际上共享库和静态库的区别主要是链接时，而编译期是相同的，既然是编译参数，那么fPIC用在静态库中也没什么奇怪的了

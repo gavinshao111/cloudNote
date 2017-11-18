@@ -41,3 +41,11 @@ sed -n '1,1p' stdout.log
 
 vi打开文件后查看16进制格式
 :%!xxd 
+
+# 添加系统服务
+cp service.sh /etc/init.d/easydarwin
+# 添加开机启动
+chkconfig --add easydarwin
+# 添加每天2点自动重启任务
+crontab -e
+# then input: * 2 * * * service easydarwin restart 
