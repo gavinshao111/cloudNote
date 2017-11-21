@@ -28,3 +28,6 @@ adb disable-verity
 adb reboot
 adb root 
 adb remount 
+
+#去掉信号叉号
+adb shell settings put global captive_portal_https_url https://www.google.cn/generate_204
