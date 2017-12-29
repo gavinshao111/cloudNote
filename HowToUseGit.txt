@@ -69,3 +69,9 @@ git:
 	
 	
 	参考： http://www.runoob.com/git/git-create-repository.html
+	
+gitignore:
+# 忽略任意路径下的dir文件夹下所有文件
+**/dir
+# 忽略o或a或d后缀的文件
+*.[oad]

@@ -10,7 +10,7 @@ du -h --max-depth=1 .
 df -h
 # 抓包
 tcpdump -i eth1 host 120.26.86.124 -w 04_12.cap
-
+tcpdump -i eth0 host 192.168.178.174 and port 9112 -w 12_20.cap
 
 # MQ 服务器 公钥 crt 转 pem:
 openssl x509 -in mycert.crt -out mycert.pem -outform PEM

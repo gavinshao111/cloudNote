@@ -35,4 +35,5 @@ password: 2
 javah -d jni -classpath D:\new\sdk\platforms\android-23\android.jar;..\..\build\intermediates\classes\debug com.lp.vehicle.JniInterface
 
 乐橙app
-u: 18100186159 p: yangzhi!@#$
+release: u: 18100186159 p: yangzhi!@#$
+debug: u: 18100186159 p: yz123123

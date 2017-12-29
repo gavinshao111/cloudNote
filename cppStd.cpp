@@ -82,3 +82,20 @@ int main()
 		cout << "read " << ifs.gcount() << " bytes: " << buf << endl;
 	}
 	ifs.close();
+
+9. time string
+#define TIMEFORMAT "%Y-%m-%d %H:%M:%S"
+string timeToStr(const time_t& time) {
+    struct tm* timeTM;
+    char strTime[22] = {0};
+    
+    timeTM = localtime(&time);
+    strftime(strTime, sizeof (strTime) - 1, TIMEFORMAT, timeTM);
+    string timeStr(strTime);
+    return timeStr;
+}
+
+10. shared_ptr
+	定义后没有用make_shared或new构造，共享指针对象为空 且 use_count() == 0
+	用make_shared或new构造后，共享指针对象非空。
+	调用reset()后共享指针对象为空 且 use_count() == 0
