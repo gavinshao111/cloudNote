@@ -47,3 +47,15 @@ done
 
 链接选项 -static 的作用：
 在某库同时存在动态库和静态库的时候，默认链接动态库，加上该选项会链接静态库。
+
+
+typedef int* int_t;
+int_t t;
+if (!t)
+	cout << "t null\n";
+
+int* p;
+if (!p)
+	cout << "p null\n";
+输出：
+p null	
