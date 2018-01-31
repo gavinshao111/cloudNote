@@ -21,6 +21,7 @@ adb uninstall com.hase.bclm.client
 
 # 捕获日志
 adb logcat -s ${TAG_NAME}
+adb logcat | findstr ${filter}
 
 # 读写系统分区若提示 Read-only file system ，则
 adb root 

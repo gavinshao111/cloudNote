@@ -35,6 +35,24 @@ qq
 com
 name:tengxun
 
+string t = "20031215T144307Z";
+std::cmatch res;
+std::regex reg("(\\d{4})(\\d{2})(\\d{2})T(\\d{2})(\\d{2})(\\d{2})Z");
+if (std::regex_match(t.c_str(), res, reg)) {
+    for (auto it : res)
+        cout << it << endl;
+}
+output:
+20031215T144307Z
+2003
+12
+15
+14
+43
+07
+
+2018-01-12_141438_0278.mp4
+"^\\d{4}\\-\\d{2}\\-\\d{2}\\_\\d{6}\\_\\d{4}\\.mp4" or "\\d{4}-\\d{2}-\\d{2}_\\d{6}_\\d{4}.mp4"
 
 	3. ref
 
@@ -74,28 +92,69 @@ int main()
 }
 
 8. std::fstream
-
+	a. 
 	ifstream ifs("123.log");
 	while(!ifs.eof()) {
 		char buf[128] = {0};
 		ifs.read(buf, 10);
 		cout << "read " << ifs.gcount() << " bytes: " << buf << endl;
 	}
+	ifs.clear();
+	ifs.seekg(ios::beg);	// 重置指针到最前
 	ifs.close();
 
+	b.
+	char buf[128];
+	ifstream ifs("/mnt/hgfs/ShareFolder/tmp/record.pcms", std::ofstream::in | std::ofstream::binary);
+	if (!ifs) {	// file not existing
+		cout << "open fail\n";
+		return 0;
+	}
+	
+	if (ifs.is_open()) { // ifs is already opened
+		cout << "opened\n";
+	} else {
+		cout << "not open\n";
+		ifs.open("/mnt/hgfs/ShareFolder/tmp/record.pcm", std::ofstream::in | std::ofstream::binary);
+	}
+	ifs.close();
+	
+	c.
+	ifstream ifs; // at this time, ifs is not null & is not opened
+
+	
 9. time string
 #define TIMEFORMAT "%Y-%m-%d %H:%M:%S"
-string timeToStr(const time_t& time) {
+string time_str(const time_t& time) {
     struct tm* timeTM;
     char strTime[22] = {0};
-    
+
     timeTM = localtime(&time);
     strftime(strTime, sizeof (strTime) - 1, TIMEFORMAT, timeTM);
-    string timeStr(strTime);
-    return timeStr;
+    return string(strTime);
 }
+
+string now_str() {
+    return time_str(time(NULL));
+}
+#define throw_err(_class_name, _err_msg) throw std::runtime_error(string(_class_name) + "::" + __func__ + ": " + _err_msg)
+time_t str_2_time(const char* format, const char* src) {
+    if (!format || !src) return -1;
+    istringstream ss(src);
+    tm TM;
+    ss >> get_time(&TM, format);
+    if (!ss.fail()) {
+        time_t r = mktime(&TM);
+        if (r >= 0) return r;
+    }
+    throw_err("", string("transfer fail, format: ") + format + ", src: " + src);
+}
+
 
 10. shared_ptr
 	定义后没有用make_shared或new构造，共享指针对象为空 且 use_count() == 0
 	用make_shared或new构造后，共享指针对象非空。
-	调用reset()后共享指针对象为空 且 use_count() == 0
+	调用reset()或置空(=nullptr)后共享指针对象为空 且 use_count() == 0
+
+11. runtime_error
+throw std::runtime_error("device::" + std::string(__func__) + ": callback not set");
