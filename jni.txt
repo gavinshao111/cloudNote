@@ -1,3 +1,5 @@
+查看java函数签名：javap -s -p java.lang.String
+
 使用aar库封装c++动态库，并在Android app中使用。
 我们有一个纯c++风格的第三方arm动态库(.so)，因为无法直接在java app中使用，需要将原始so库封装成符合JNI规范的so库（以下简称封装so库），然后才能通过JNI在java app中使用。我的需求并非直接在Android app中使用，而是再封装成Android app能直接使用的jar包或aar包，然后做成Android SDK发布。所以实质是将c++的SDK转换为Android SDK
 

@@ -13,6 +13,9 @@ ref: http://blog.csdn.net/beyondlpf/article/details/7680760
 
 	2. regex
 	
+\w 匹配包括下划线的任何单词字符。等价于'[A-Za-z0-9_]'
+	
+	
 const char* mail = "tengxun@qq.com";
 boost::cmatch res;
 
@@ -53,6 +56,10 @@ output:
 
 2018-01-12_141438_0278.mp4
 "^\\d{4}\\-\\d{2}\\-\\d{2}\\_\\d{6}\\_\\d{4}\\.mp4" or "\\d{4}-\\d{2}-\\d{2}_\\d{6}_\\d{4}.mp4"
+
+ANNOUNCE rtsp://120.26.86.124:8888/record/20180131132928/1/0/2018-02-05_092500_0300.sdp RTSP/1.0\r\n\r\nContent-Type: application/sdp\r\n\r\nCSeq: 2\r\n\r\nUser-Agent: LeapMotor Push v1.0\r\n\r\nContent-Length: 297\r\n\r\n\r\n
+^([a-zA-Z]+) (rtsp://[^/]+/(([a-z]+)/(\\S+)/(\\d)/(\\d+)/(\\S+).sdp))[\\s\\S]+User-Agent:[ ]*(.+)[\\s\\S]+
+
 
 	3. ref
 

@@ -15,12 +15,17 @@ git:
 	分支
 	git branch branch_name	//创建分支
 	git checkout branch_name	//切换分支
+	git reset --hard develop  //将本地的旧分支 master 重置成 develop
+	git push origin master --force //再推送到远程仓库	
 	
 
 	查看
 	git ls-files 查看仓库文件
 	git status -s 查看当前文件修改状态(-s simple)
 
+	撤销add，文件退出暂存区，但是修改保留
+	git reset --mixed
+	
 	删除
     git rm --cached File_name //放弃跟踪某文件 -r 放弃跟踪文件夹
     git rm -r --cached path/ //放弃path下所有文件的跟踪。
