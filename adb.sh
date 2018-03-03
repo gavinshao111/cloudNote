@@ -32,3 +32,7 @@ adb remount
 
 #去掉信号叉号
 adb shell settings put global captive_portal_https_url https://www.google.cn/generate_204
+
+# fastboot
+fastboot flash recovery *.img
+fastboot boot *.img
