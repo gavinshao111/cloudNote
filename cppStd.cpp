@@ -164,6 +164,34 @@ time_t str_2_time(const char* format, const char* src) {
     throw_err("", string("transfer fail, format: ") + format + ", src: " + src);
 }
 
+获取毫秒数：
+#include <ctime>
+#include <chrono>
+#include <sys/time.h>
+#include <sys/timeb.h>
+using namespace std;
+
+int main() {
+	// c11
+    auto time_now = chrono::system_clock::now();
+    auto duration_now = time_now.time_since_epoch();
+    int millsec = chrono::duration_cast<chrono::milliseconds>(duration_now).count()
+            - chrono::duration_cast<chrono::seconds>(duration_now).count() * 1000;
+    
+	// Linux
+    struct timeval tv;
+    gettimeofday(&tv, NULL); //该函数在sys/time.h头文件中
+    __suseconds_t millsec_1 = tv.tv_usec;
+
+	// Linux
+    struct timeb stTimeb;
+    ftime(&stTimeb);
+    unsigned short int millsec_2 = stTimeb.millitm;
+
+    return 0;
+}
+
+
 
 10. shared_ptr
 	定义后没有用make_shared或new构造，共享指针对象为空 且 use_count() == 0
