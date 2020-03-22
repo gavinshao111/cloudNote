@@ -1,4 +1,24 @@
-一、 JVM相关
+一、集合
+ 1. hash
+  ·概念：一种将任意长度的消息压缩到某一固定长度的消息摘要的函数。
+  ·哈希冲突：不同输入得到相同输出。HashMap中的解决办法：
+
+ 2. Map
+  ·类型：HashMap，LinkedHashMap，TreeMap。若不需要保持元素的顺序，用HashMap，若保持元素的插入顺序或者访问顺序，用LinkedHashMap，若需要按照键值排序，用TreeMap。
+  ·HashMap：数组+链表+红黑树，k和v允许为空
+   a. put(k,v)流程：
+    若table空则扩容。根据k计算hash值，得到table索引，索引位置上Node为空即不存在hash冲突，则创建新Node放入；否则即hash冲突，判断两个Node.key是否相同，相同则替换v；否则
+    判断是否为红黑树，是则将Node插入红黑树；否则遍历table，找key的Node，找到则替换v，否则在最后插入Node，若个数超过8个，则转换为红黑树。
+   b. 如何解决哈希冲突：
+    ·使用链地址法（使用散列表）来链接拥有相同hash值的数据；
+    ·使用2次扰动函数（hash函数）来降低哈希冲突的概率，使得数据分布更平均；
+    ·引入红黑树进一步降低遍历的时间复杂度，使得遍历更快；
+
+  ·ConcurrentHashMap：分段的数组+链表实现，使用锁分离（一段一锁）实现线程安全
+  ·Hashtable：数组+链表实现，k和v都不允许空，通过唯一的锁（synchronized）实现线程安全
+  ·CopyOnWrite集合：写时复制，线程安全，读写分离。在写入数据时先复制集合，再插入数据，再替换旧集合。多线程写数据仍然需要加锁。
+
+二、 JVM相关
 
  1. 垃圾回收：
 
@@ -44,17 +64,30 @@
   ·常量池
   ·本地方法栈，与Java虚拟机栈类似
 
- 4. 类加载过程：
- ·加载load：将字节码数据从不同的数据源（二进制class文件）读取到 JVM 中，并映射为 JVM 认可的数据结构（Class 对象）
- ·链接link：把原始的类定义信息平滑地转化入 JVM 运行的过程中，分为验证（验证字节码是否符合规范），准备，解析
- ·初始化initialize：运行静态变量和静态初始化块代码
+ 4. 类加载
+  a. 过程： vm把class文件加载到内存，对数据校验，转换，解析，初始化。
+   ·加载load：将字节码数据从不同的数据源（class文件，jar包，网络等）读取到JVM中，并映射为JVM认可的数据结构（Class对象）
+   ·链接link：把原始的类定义信息平滑地转化入 JVM 运行的过程中，分为验证（验证字节码是否符合规范），准备（定义好必须的数据结构），解析（将常量池的符号引用替换为直接引用）
+   ·初始化initialize：运行静态变量和静态初始化块代码
+
+  b. 类加载器
+   ·启动（Bootstrap）：将<Java_Runtime_Home>/lib下面的类库加载进来。不可用
+   ·标准扩展（Extension）：将<Java_Runtime_Home>/lib/ext中的类库加载进来。可使用
+   ·系统（System）：将系统类路径（CLASSPATH）中的类库加载进来。可用
+   ·用户自定义：在运行时，通过java.lang.ClassLoader的子类动态加载class文件
+   ·线程上下文类加载器
+
+  c. 双亲委派
+   ·定义：当某个ClassLoader需要加载类时，先委托父类加载器（parent classloader，若不存在，则默认使用启动类加载器作为父类加载器）完成，若无法加载再自己去加载
+   ·原因：比如要加载java.lang.Object，若由不同的classloader自行加载，则加载后的类不是同一个类（比如用户编写同名类放在classpath中），因此将类加载任务往上抛给顶层classloader（启动类加载器），加载出来的类是相同的。
+   ·模型（各个类加载器层级关系，Composition组合）：User -> System -> Extension -> Bootstrap
 
  5. 常见问题
   ·StackOverflowError：递归没返回，或者循环调用
   ·OutOfMemoryError：由于反射过多使用，导致持久代满；线程过多；内存泄漏；参数设置不合理
 
 
-二、SpringBoot
+三、SpringBoot
 
  ·优点：约定大于配置
   1. 简化配置：无需 XML 配置文件，能自动扫描包路径装载并注入对象，并能做到根据 classpath 下的 jar 包自动配置；启动器自动依赖其他组件，简少了maven的配置
@@ -75,7 +108,38 @@
   1. 跨域：HTTP请求时必须遵守同源策略，否则就是跨域。解决方案：前后端分离的框架下，前端使用nodejs中转请求地址；controller上加@CrossOrigin
 
 
-三、数据库
+四、设计模式
+ 1. 构造器模式：
+  某个类所有字段不可更改，所以设为final，则必须在构造函数赋值，但部分字段可以使用默认值，即构造时可不必传值，此时只能定义多个构造函数：
+  public class A {
+    private final int a; // 必须
+    private final int b; // 可选
+    private final int c; // 可选
+
+    public A(int a, int b, int c) {...}
+    public A(int a, int b) {...}
+    public A(int a, int c) {...} // 与上个构造函数矛盾
+    public A(int a) {...}
+  }
+  当属性比较多时，不仅写起来麻烦，而且若出现同类型的可选字段，将无法重载。因此可以定义一个内部静态类，用来构造A
+    public static class Builder {
+        private final int a; // 必须
+        private int b; // 可选
+        private int c; // 可选
+
+        public Builder(int a) {this.a = a;}
+        public Builder b(int b) {this.b = b;return this;}
+        public Builder c(int c) {this.c = c;return this;}
+        public A build() {return new A(this);}
+    }
+   在使用时：
+        A i = new A.Builder(1).b(9).build();
+        A i1 = new A.Builder(1).build();
+        A i2 = new A.Builder(1).c(2).build();
+   除了必须的属性a，可以自由设置属性b或c，同时A不用写很多构造函数。
+
+
+五、数据库
 
  ·分区
   ·好处：可以存放更多数据，因为分开保存在不同文件里；删除数据更快，比如按时间分区，想删除早期数据，可通过删除分区来实现；涉及聚合函数SUM()、COUNT()的查询时，每个分区并行处理。
@@ -133,17 +197,21 @@ MySQL性能优化(五)：分表 https://blog.csdn.net/vbirdbest/article/details/
 MySQL 四种事务隔离级的说明 https://www.cnblogs.com/zhoujinyi/p/3437475.html
 MySQL高级知识（七）——索引面试题分析 https://www.cnblogs.com/developer_chan/p/9223671.html 出现部分错误
 分享几道关于MySQL索引的重点面试题 https://www.jb51.net/article/161520.htm
-
+Java类加载器与双亲委派模式的详解 https://blog.csdn.net/weixin_38055381/article/details/81382115
+常用的几种java集合类总结 https://blog.csdn.net/gejiangbo222/article/details/81540616
+面试必备：HashMap、Hashtable、ConcurrentHashMap的原理与区别 https://www.cnblogs.com/heyonggang/p/9112731.html
+Java集合必会14问（精选面试题整理） https://www.jianshu.com/p/939b8a672070
  3面
  1面 基础
- 1. 集合，并发集合，集合原理
- 2. jvm，gc done
- 3. SpringBoot，双虚拟态，构造器模式，类加载器
+ 1. 集合，并发集合，集合原理 done
+ 2. jvm，gc 类加载器，双亲委派，done
+ 3. SpringBoot done
  4. sql 索引，优化，分库分表，事务隔离 done
  5. kafka，redis mongo 区别，redis单节点故障如何处理，缓存淘汰，一致性hash
  6. http基础
  7. 故障排查
  8. 项目难点，如何解决
  9. nio
+ 10. 设计模式：构造器模式 done
 
 
