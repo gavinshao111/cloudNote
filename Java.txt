@@ -1,0 +1,149 @@
+一、 JVM相关
+
+ 1. 垃圾回收：
+
+  a. 算法：
+   按策略分：引用计数，标记-清除，复制，标记-整理
+   按系统线程分：
+    串行（暂停程序，单线程，适合单处理器，小数据量），-XX:+UseSerialGC
+    并行（暂停线程， 多线程回收），-XX:+UseParallelGC
+    并发（不暂停程序，运行时回收垃圾，会产生碎片问题）
+
+  b. 哪些对象会被回收：可达性算法，从程序运行的根节点出发，遍历整个对象引用，未被引用的，再经历两次标记，会回收
+
+  c. 分代垃圾回收：因为不同的对象的生命周期是不一样的，采用分治的思想。
+   ·年轻代：Eden区+s1(survivor)+s2。
+   ·年老代：过小了，可以会造成内存碎片、高回收频率以及应用暂停；过大会使GC时间过长
+   ·持久代（Permanent）：存放的是Java类的类信息
+   GC时，存活对象流转流程：程序产生对象先在Eden区，Eden区满即会触发MinorGC
+   1. 第一次，将Eden存活对象复制到s1，重复次循环；
+   2. 当s1满时，s1存活对象（o1）复制到s2，Eden区存活对象(o2)复制到s2。此后Eden满时，都复制到s2，重复此循环
+   3. 当s2满时，将o1复制到年老区，o2复制到s1区。重复1，2，3循环
+   4. 当年老区满时，触发FullGC
+
+  d. G1增量回收，将堆分成很多Region来进行内存管理。步骤：
+    1、初始标记（它标记了从GC Root开始直接可达的对象）
+    2、并发标记（从GC Roots开始对堆中对象进行可达性分析，找出存活对象）
+    3、最终标记（标记那些在并发标记阶段发生变化的对象，将被回收）
+    4、筛选回收（首先对各个Regin的回收价值和成本进行排序，根据用户所期待的GC停顿时间指定回收计划，回收一部分Region）
+
+ 2. 调优
+
+  a. 参数：
+   ·-Xms:初始堆大小
+   ·-Xmx:最大堆大小
+   ·-XX:NewRatio=n:设置年轻代和年老代的比值
+   ·-Xss:分配给单个线程的空间
+  b. 策略：减少GC的频率和Full GC的次数
+
+ 3. JVM内存管理
+  ·程序寄存器，Program Counter Register
+  ·Java虚拟机栈
+  ·堆
+  ·方法区（永久代），之后将被元数据区（Metaspace）替代
+  ·常量池
+  ·本地方法栈，与Java虚拟机栈类似
+
+ 4. 类加载过程：
+ ·加载load：将字节码数据从不同的数据源（二进制class文件）读取到 JVM 中，并映射为 JVM 认可的数据结构（Class 对象）
+ ·链接link：把原始的类定义信息平滑地转化入 JVM 运行的过程中，分为验证（验证字节码是否符合规范），准备，解析
+ ·初始化initialize：运行静态变量和静态初始化块代码
+
+ 5. 常见问题
+  ·StackOverflowError：递归没返回，或者循环调用
+  ·OutOfMemoryError：由于反射过多使用，导致持久代满；线程过多；内存泄漏；参数设置不合理
+
+
+二、SpringBoot
+
+ ·优点：约定大于配置
+  1. 简化配置：无需 XML 配置文件，能自动扫描包路径装载并注入对象，并能做到根据 classpath 下的 jar 包自动配置；启动器自动依赖其他组件，简少了maven的配置
+  2. 独立运行（内嵌容器），
+  3. 应用监控
+
+ ·基本工作原理：在启动的时候，按照约定去读取 Spring Boot Starter 的配置信息，再根据配置信息对资源进行初始化，并注入到 Spring 容器中。这样 Spring Boot 启动完毕后，就已经准备好了一切资源，使用过程中直接注入对应 Bean 资源即可
+
+ ·自动配置原理：添加@SpringBootApplication或者@EnableAutoConfiguration，会自动去maven读取starter中的META-INF/spring.factories，该文件包含了所有需要的bean
+
+ ·三个核心注解：
+  1.@Configuration：实现配置文件的功能，代替applicationContext.xml，@Bean代替XML配置文件里面的<bean ...>
+  2.@EnableAutoConfiguration：打开自动配置的功能，它能根据类路径下的 jar 包和配置动态加载配置和注入bean
+  3.@ComponentScan：Spring组件扫描。开启后会自动扫描包路径下的@Component注解的bean实例到context中
+  @SpringBootApplication包含了以上三个注解。
+
+ ·常见问题
+  1. 跨域：HTTP请求时必须遵守同源策略，否则就是跨域。解决方案：前后端分离的框架下，前端使用nodejs中转请求地址；controller上加@CrossOrigin
+
+
+三、数据库
+
+ ·分区
+  ·好处：可以存放更多数据，因为分开保存在不同文件里；删除数据更快，比如按时间分区，想删除早期数据，可通过删除分区来实现；涉及聚合函数SUM()、COUNT()的查询时，每个分区并行处理。
+  ·注意点：如果表中存在主键或唯一索引时，分区列必须是唯一索引的一个组成部分
+  ·分区类型：RANGE分区：利用取值范围将数据分区；HASH分区：基于给定的分区个数，将数据分配到不同分区
+
+ ·分表分库分片：可以减少IO操作；增加查询速度。
+  ·垂直分割：按列分，把一张列比较多的表拆分为多张表。 垂直分割一般用于拆分大字段和访问频率低的字段，分离冷热数据
+  ·水平分割：按行分。避免单一表数据量过大对性能造成影响
+   1. 根据数值范围分片，如按id或时间分。易拓展，大小可控，易查询，但热点数据会成为性能瓶颈，比如按时间分，会频繁查询最近数据，历史数据很少查询。
+   2. 根据数据取模分片，如根据id尾号分为10片，均匀分布。不易出现热点和性能瓶颈，但扩容迁移旧数据不方便，面临分片查询的复杂问题，比如查询条件没有包含id
+
+ ·事务隔离
+  ·基本要素
+   1. 原子性
+   2. 一致性：数据库的完整性约束不能被破坏，比如A转账给B，A扣了钱，B账上也必须增加。
+   3. 隔离性：同一时间，只允许一个事务请求同一数据，不同的事务之间彼此没有任何干扰。
+   4. 持久性：事务完成后，更新将被保留，不能回滚。
+
+  ·并发问题：脏读（回滚前后读取数据差异），不可重复读（多次读取中，数据被更新，导致多次读取结果不同，针对行），幻读（全表修改时，另一个事务插入新数据）
+
+  ·隔离级别
+   1. 读未提交read-uncommitted：     A事务期间，能立即获取到B事务期间对数据的修改，B回滚也会对A造成影响（脏读）
+   2. 读已提交read-committed：       A事务期间，能获取到B事务提交后对数据的修改（重复读，幻读）
+   3. 可重复读（repeatable-read）：  A事务期间，B对数据的修改在A提交后才能获取到，若A修改数据则能立即获取到B的修改，比如修改所有记录，会发现Rows matched多一条（幻读）
+   4. 串行化（serializable）：锁表
+
+ ·索引：加快检索速度，但是增删改的时候需要维护成本。通过事先排好序，从而在查找时可以应用二分查找等高效率的算法。
+  ·组合索引最左前缀原则：where子句中，某个有索引的字段未使用索引（包括未出现在where字句中）或使用范围条件后，该字段后面（右侧）的有索引的字段无法再使用索引。
+   如create index idx_test_c1234 on test(c1,c2,c3,c4)，where c1='a' and c4='a' and c2>'a' and c3='a'; 其中c3虽然是索引字段，虽然c4在where中排在c2前面，但是c2使用了范围条件，因此c3c4上的索引都失效
+  ·explain中extra：
+   1. filesort：排序时无法使用索引
+   2. temporary：产生临时表
+   以下为optional
+   3. index：覆盖索引（select id form t where id=1）
+   4. where：查找使用索引时，需要回表查询所需数据
+   5. index condition：查找使用索引后，再次使用非索引条件，如a为索引，b非索引，where a=1 and b=2;
+  ·主键索引与非主键索引区别：非主键索引的叶子节点存放的是主键的值，先查到主键值，然后再根据主键值查询到整行数据
+
+
+
+
+
+引用：
+JVM调优总结 https://www.cnblogs.com/andy-zhou/p/5327288.html
+几率大的JVM面试题（含答案） https://blog.csdn.net/Butterfly_resting/article/details/89705057
+
+SpringBoot常见面试问题 https://blog.csdn.net/zhoushimiao1990/article/details/99713372
+Spring Boot 面试，一个问题就干趴下了！ https://zhuanlan.zhihu.com/p/61028032
+spring boot 面试题详解 https://www.cnblogs.com/lingboweifu/p/11797926.html
+
+MySQL中的分区是什么？为什么要分区？有什么好处？怎么进行分区？ https://blog.csdn.net/jiang7701037/article/details/81839899
+MySQL性能优化(五)：分表 https://blog.csdn.net/vbirdbest/article/details/81084182
+数据库分库分表思路 https://www.cnblogs.com/butterfly100/p/9034281.html
+MySQL 四种事务隔离级的说明 https://www.cnblogs.com/zhoujinyi/p/3437475.html
+MySQL高级知识（七）——索引面试题分析 https://www.cnblogs.com/developer_chan/p/9223671.html 出现部分错误
+分享几道关于MySQL索引的重点面试题 https://www.jb51.net/article/161520.htm
+
+ 3面
+ 1面 基础
+ 1. 集合，并发集合，集合原理
+ 2. jvm，gc done
+ 3. SpringBoot，双虚拟态，构造器模式，类加载器
+ 4. sql 索引，优化，分库分表，事务隔离 done
+ 5. kafka，redis mongo 区别，redis单节点故障如何处理，缓存淘汰，一致性hash
+ 6. http基础
+ 7. 故障排查
+ 8. 项目难点，如何解决
+ 9. nio
+
+

@@ -1,17 +1,19 @@
 # cp /data/*/base.apk to /sdcard/backup/apps/ and# rename to *.apk
 # com.sina.weibo-1/base.apk -> com.sina.weibo-1 -> weibo-1.apk
 
-filelist=`ls */base.apk`
+mkdir /sdcard/backup/apps
+filelist=`ls /data/app/*/base.apk`
 for file in $filelist
 do
+	echo ${file}
 	tmp=${file%/*}
-	#echo ${file}
-	# tmp=${tmp##*.}
-	#echo ${file}
+	tmp=${tmp##*.}
+	#echo ${tmp}
 	cp -a ${file} /sdcard/backup/apps/${tmp}.apk
-	echo ${tmp}
 done
 
+# 然后通过adb pull 复制到pc
+adb pull sdcard/backup/apps E:\brush\sagit\backup\
 
 # #：表示从左边算起第一个
 # %：表示去掉从右边算起到第一个
