@@ -53,7 +53,11 @@
    ·-Xms:初始堆大小
    ·-Xmx:最大堆大小
    ·-XX:NewRatio=n:设置年轻代和年老代的比值
+   ·-Xmn:年轻代大小
+   ·-XX:SurvivorRatio：新生代中Eden区域与Survivor区域的容量比值，默认值为8
    ·-Xss:分配给单个线程的空间
+   ·-XX:PermSize：设置永久代(perm gen)初始值
+   ·-XX:MaxPermSize：设置持久代最大值
   b. 策略：减少GC的频率和Full GC的次数
 
  3. JVM内存管理
@@ -189,16 +193,43 @@
       ·过期清除策略：定期清除：每隔100ms随机检查一些key是否过期；惰性删除：在用户访问时检查是否过期
       ·缓存淘汰：当实际内存超出maxmemory时，提供的淘汰策略
         默认noeviction（只允许读），针对设有过期时间的：volatile-lru（最近使用距今最远），volatile-ttl（寿命最短），volatile-random（随机淘汰），针对所有的：allkeys-lru，allkeys-random
-      ·分布式锁：基于redission自带可重入锁；基于Jedis自己实现：
-        ·上锁：设置某个key值，为避免死锁，并给定一个过期时间：SET lock_key client_id NX PX 5000。其中NX表示只在key不存在时设置，PX 5000表示5s过期。
-        ·如何判断是否获取到锁：
-          1. SET操作成功？
-          2. 获取lock_key的值client_id，是否与当前client_id相等，相等则代表获取到。
+      ·分布式锁：使用setnx命令，只当key不存在时成功，设置过期时间以防止死锁；基于redission自带可重入锁
+      ·集群方案：
+         a. 主从：主从复制不会阻塞master，slave为只读
+         b. cluster：把n个槽（slot）分摊给m个node，根据key进行散列（hash），分配到slot中。当某个node挂了，需要重新分摊slot，其中的key也要迁移。解决：每个node可以再搭主从结构，当master挂了选举一个slave顶上，提高cluster可用性。比普通的主从方案提高了IO并发能力。
+         c. codis/twemproxy：处于客户端和服务器的中间，将客户端发来的请求，进行一定的处理后(如sharding)，再转发给后端真正的Redis服务器
       ·常见问题
         ·缓存雪崩：大量key同时失效，去请求后面的关系型数据库，导致数据库瞬时访问量巨大导致崩溃。解决：避免大量key同时失效，选择合适的缓存淘汰策略；使用持久化机制恢复数据。
         ·缓存击穿：大量用户同时请求一个redis中没有（过期）的数据，导致数据库瞬时访问量巨大导致崩溃。解决：对redis中没有需要去数据库查询的数据加锁，获取锁后再从查询缓存。
         ·缓存穿透：蓄意高频请求不存在的数据，导致数据库资源被占满而崩溃。解决：对用户鉴权；对key进行业务合理性检验；若数据库也没查到数据，则将空值写入缓存，并设置短时过期，这样在过期前高频攻击请求也不会去数据库请求，减少数据库压力。
-        ·单点故障：
+        ·一致性hash：因为普通的集群方案，对key哈希函取模让key平均分布在各个node上，当node新增时，需要重新分配，因此使用一致性hash方案：
+          a. 先构造一个长度为2^32的整数环（一致性Hash环），根据node名称的Hash值（[0, 2^32-1]），将n个node放置在这个Hash环上，将环划分成n段
+          b. 然后计算某个key的hash（[0, 232-1]），放在环上，顺时针查找下个node，并映射。
+          c. 当增加node时，只会影响某一段环上的部分key映射。
+        ·同一个项目可以通过redis直接插入/获取类对象，不同的项目由于类不同，无法直接将redis中其他项目的类对象转化为当前类对象。比如日志消费写入故障类实例，carmonitor即使使用完全相同的故障类，也无法将redis中的实例反序列化为自己的实例。需要转化为json字符串。
+
+    3. MongoDB：更类似 MySQL，支持字段索引、游标操作，其优势在于查询功能比较强大，擅长查询 JSON 数据，能存储海量数据，但是不支持事务。数据存在内存，由linux系统mmap实现
+
+    4. kafka：一条消息会分发给所有的消费组，消费组内部再分发给其中一个消费者；offset代表消费进度
+
+项目中遇到的问题：
+1. 在月初/底查询流量时，需要统计当月充值流量，由于数据库中时间与运行环境时间不一致，导致统计得到的当月充值流量错误。比如在8月1号1点查询当月充值流量，使用数据库内置函数curdate()可能会返回7月31号19点，这样查询出来的充值流量将为7月充值流量，产生bug。
+在月初/底查询流量时，需要统计当月充值流量，由于数据库中时间与运行环境时间不一致，导致统计得到的当月充值流量错误。比如在8月1号1点查询当月充值流量，使用数据库内置函数curdate()可能会返回7月31号19点，这样查询出来的充值流量将为7月充值流量，产生bug。
+
+2. 流量充值后，流量从负变为正，支付宝Api充值回调中需要调易达通恢复上网接口，支付宝回调返回超时，会重复调用产生业务bug。	易达通相关接口为耗时操作，导致支付宝支付回调超时。	在充值回调中起线程完成业务操作，使立刻充值回调立刻返回。
+
+3. 频繁切换使用涉及到国标数据库与车联网数据库的功能，即频繁切换数据源，会出现选择错误的数据库/源，导致接口报错	接口未正确使用MyBatisPlus那套选择数据源的方法	接口正确使用MyBatisPlus那套选择数据源的方法	明确项目数据库框架是MyBatis还是MyBatsisPlus；减少使用MyBatsisPlus
+
+4. 47.98.47.77服务器CPU达到100%，carmonitor服务CPU使用率达到最高，一直处于100%状态	carmonitor服务使用内存512M过小，导致GC过于频繁，CPU达到了100%	设置carmonitor的内存大小为1G
+
+5. 零云平台无法使用，同时日志打印内存溢出	国标数据导出多次请求数据量过大，在导出期间内存无法释放，从而导致服务停止	优化数据导出，变查询边导出
+
+6. 车机下载OTA升级包，中控断开所有网络，零云平台显示下载完成，下载链接未断开	nginx代理配置不正确，配置有缓存，车机断开下载链接后，服务器写数据全部写到nginx缓存，当缓存写满之后就写到了临时文件里。	修改nginx配置，修改nginx里location->proxy_buffering off。此配置关闭此location的代理缓存
+
+7. 测试及项目反映部分车辆从2月16日后没有行程数据，故障信息及整车日志	存在部分kafka分区数据未消费的情况，重启后能重新消费;根本原因还待分析
+
+8. 测试环境上传途记视频失败，接口返回413错误	nginx代理默认配置不正确，途记视频文件大小超过nginx对于文件大小的限制。	修改nginx配置，修改nginx里nginx.ingress.kubernetes.io/proxy-body-size项的值超过视频文件大小。
+
 
 引用：
 JVM调优总结 https://www.cnblogs.com/andy-zhou/p/5327288.html
@@ -223,6 +254,9 @@ redis缓存淘汰策略 https://www.cnblogs.com/RitualYang/p/12219360.html
 Redis面试题总结 https://www.jianshu.com/p/65765dd10671
 缓存穿透、缓存击穿、缓存雪崩区别和解决方案 https://blog.csdn.net/kongtiao5/article/details/82771694
 分布式锁之Redis实现 https://www.jianshu.com/p/47fd7f86c848
+几率大的Redis面试题（含答案） https://blog.csdn.net/Butterfly_resting/article/details/89668661
+redis常用集群方案 https://www.jianshu.com/p/1ecbd1a88924
+对一致性Hash算法，Java代码实现的深入研究 https://www.cnblogs.com/xrq730/p/5186728.html
 
  3面
  1面 基础
@@ -230,11 +264,15 @@ Redis面试题总结 https://www.jianshu.com/p/65765dd10671
  2. jvm，gc 类加载器，双亲委派，done
  3. SpringBoot done
  4. sql 索引，优化，分库分表，事务隔离 done
- 5. kafka，redis mongo 区别，redis单节点故障如何处理，缓存淘汰，一致性hash
+ 5. kafka，redis mongo 区别，redis单节点故障如何处理，缓存淘汰，一致性hash done
  6. http基础
  7. 故障排查
  8. 项目难点，如何解决
  9. nio
  10. 设计模式：构造器模式 done
+ 11. 数据结构：tree
 
+
+to learn:
+hive hadoop map reduce 实时流计算 storm
 
