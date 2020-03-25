@@ -18,6 +18,7 @@
   ·Hashtable：数组+链表实现，k和v都不允许空，通过唯一的锁（synchronized）实现线程安全
   ·CopyOnWrite集合：写时复制，线程安全，读写分离。在写入数据时先复制集合，再插入数据，再替换旧集合。多线程写数据仍然需要加锁。
 
+
 二、 JVM相关
 
  1. 垃圾回收：
@@ -86,9 +87,13 @@
    ·原因：比如要加载java.lang.Object，若由不同的classloader自行加载，则加载后的类不是同一个类（比如用户编写同名类放在classpath中），因此将类加载任务往上抛给顶层classloader（启动类加载器），加载出来的类是相同的。
    ·模型（各个类加载器层级关系，Composition组合）：User -> System -> Extension -> Bootstrap
 
- 5. 常见问题
+ 5. volatile：类型修饰符，确保本条指令不会因编译器的优化而省略
+
+ 6. 常见问题
   ·StackOverflowError：递归没返回，或者循环调用
   ·OutOfMemoryError：由于反射过多使用，导致持久代满；线程过多；内存泄漏；参数设置不合理
+
+
 
 
 三、SpringBoot
@@ -212,9 +217,29 @@
 
     4. kafka：一条消息会分发给所有的消费组，消费组内部再分发给其中一个消费者；offset代表消费进度
 
+
+六、网络协议
+  1. tcp
+    ·OSI七层模型：物理层->数据链路层->网络层->传输层->会话层->表示层->应用层
+  2. http
+    ·状态码：200 成功，400 客户端语法错误，403 服务端拒绝服务，404 url错误，500 服务端错误
+    ·请求报文组成：请求行（HTTP协议版本号，状态码，状态消息）、请求头部、空行和请求数据
+    ·cookie：当浏览网站时，由Web服务器置于你硬盘上的一个非常小的文本文件，它可以记录你的用户ID、密码、浏览过的网页、停留的时间等信息
+  3. https:
+    ·认证原理：c生成随机码，使用s提供的公钥加密后发给s，s使用私钥解密后获取到c的随机码，之后通过此随机码对称加密/解密内容。
+
+
+七、NIO
+  1. netty
+    ·server端流程：
+      a. new两个EventLoopGroup分别用来处理连接事件和已连接的读写事件，他们实际是两个独立的Reactor线程池
+      b. new ServerBootstrap启动NIO服务的辅助启动类，并使用上面两个group初始化，并设置事件（连接事件，读事件）到达时如何处理的handler
+      c. ServerBootstrap绑定端口，阻塞等待关闭
+      d. 关闭后释放所有资源
+
+
 项目中遇到的问题：
 1. 在月初/底查询流量时，需要统计当月充值流量，由于数据库中时间与运行环境时间不一致，导致统计得到的当月充值流量错误。比如在8月1号1点查询当月充值流量，使用数据库内置函数curdate()可能会返回7月31号19点，这样查询出来的充值流量将为7月充值流量，产生bug。
-在月初/底查询流量时，需要统计当月充值流量，由于数据库中时间与运行环境时间不一致，导致统计得到的当月充值流量错误。比如在8月1号1点查询当月充值流量，使用数据库内置函数curdate()可能会返回7月31号19点，这样查询出来的充值流量将为7月充值流量，产生bug。
 
 2. 流量充值后，流量从负变为正，支付宝Api充值回调中需要调易达通恢复上网接口，支付宝回调返回超时，会重复调用产生业务bug。	易达通相关接口为耗时操作，导致支付宝支付回调超时。	在充值回调中起线程完成业务操作，使立刻充值回调立刻返回。
 
@@ -258,6 +283,9 @@ Redis面试题总结 https://www.jianshu.com/p/65765dd10671
 redis常用集群方案 https://www.jianshu.com/p/1ecbd1a88924
 对一致性Hash算法，Java代码实现的深入研究 https://www.cnblogs.com/xrq730/p/5186728.html
 
+Java面试之http知识点（必问） https://www.cnblogs.com/it-tsz/p/11408668.html
+
+
  3面
  1面 基础
  1. 集合，并发集合，集合原理 done
@@ -265,14 +293,14 @@ redis常用集群方案 https://www.jianshu.com/p/1ecbd1a88924
  3. SpringBoot done
  4. sql 索引，优化，分库分表，事务隔离 done
  5. kafka，redis mongo 区别，redis单节点故障如何处理，缓存淘汰，一致性hash done
- 6. http基础
+ 6. http基础 done
  7. 故障排查
  8. 项目难点，如何解决
- 9. nio
+ 9. nio netty done
  10. 设计模式：构造器模式 done
  11. 数据结构：tree
-
+ 12. 个人优势：nio编程模型
 
 to learn:
-hive hadoop map reduce 实时流计算 storm
+hive hadoop map reduce 实时流计算 storm netty
 
