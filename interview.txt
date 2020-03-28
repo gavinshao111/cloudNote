@@ -158,7 +158,11 @@ SMF类型有普通普票，优先股，债券，Money Market，repo，swap，fix
 2. ha proxy作用，地址映射是ha proxy还是nginx，如果haproxy挂了怎么办
     作用：负载均衡。使用 keepalived 监听 haproxy 节点是否挂机，挂了启用备份的 haproxy 节点，从而达到高可用
 3. redis和MySQL写同一个数据如何保证一致性。一个数据既在redis又在MySQL，要更新时如何修改？如何一个修改失败怎么办？
-
+    ·双删：
+        1. 删除缓存
+        2. 更新数据库
+        3. 删除缓存（1、2之间可能有请求查询缓存，发现缓存不存在再请求数据库得到旧值，然后旧值又被写入缓存，所以这里把缓存删除，排除这种情况）
+    ·订阅MySQL binlog，删除缓存；
 4. MySQL查询优化，如何查看索引有没有用到
     使用EXPLAIN查看执行计划。
     type：这是重要的列，显示连接使用了何种类型。从最好到最差的连接类型为const、eq_reg、ref、range、index和ALL
