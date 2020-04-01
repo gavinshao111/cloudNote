@@ -115,7 +115,7 @@
   ·OutOfMemoryError：由于反射过多使用，导致持久代满；线程过多；内存泄漏；参数设置不合理
 
 
-
+name code 拼音简称 市场
 
 三、SpringBoot
 
@@ -256,7 +256,7 @@
     ·c/s在四次挥手过程中的状态变化过程：
         c/s挥手前都是established
         1. c发出FIN后 -> FIN-WAIT-1
-        2. s收到FIN后发出ACK -> CLOSED-WAIT
+        2. s收到FIN后发出ACK -> CLOSE-WAIT
         3. c收到后 -> FIN-WAIT-2
         4. s发送FIN -> LAST-ACK
         5. c收到后发出ACK -> TIME-WAIT，等待2MSL段时间后 -> closed
