@@ -62,6 +62,11 @@ ANNOUNCE rtsp://120.26.86.124:8888/record/20180131132928/1/0/2018-02-05_092500_0
 
 匹配双字节字符(包括汉字在内)：[^\x00-\xff]
 
+贪婪/懒惰
+[09:18:27:183] [INFO] - com.leapmotor.emqservice.service.impl.VehicleFaultService.parseFaultFromCan(VehicleFaultService.java:95) - longitude: 120.0, latitude: 30.0
+懒惰模式： ^(.)+? - 匹配到"[09:18:27:183] [INFO] - "
+贪婪模式：^(.)+ - 匹配到"[09:18:27:183] [INFO] - com.leapmotor.emqservice.service.impl.VehicleFaultService.parseFaultFromCan(VehicleFaultService.java:95) - "
+
 	3. ref
 
 void T1Task(A& a);
