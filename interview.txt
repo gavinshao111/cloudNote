@@ -233,3 +233,36 @@ gdb 多线程调试
 
 2020/5 恒生 c++
 用到哪些高可用框架，redis?mysql?哨兵模式
+
+2020/7 阿里 java
+2.有一个字符串它的构成是词+空格的组合，如“北京 杭州 杭州 北京”， 要求输入一个匹配模式（简单的以字符来写）， 比如 aabb, 来判断该字符串是否符合该模式， 举个例子：
+pattern = "abba", str="北京 杭州 杭州 北京" 返回 true
+pattern = "aabb", str="北京 杭州 杭州 北京" 返回 false
+pattern = "baab", str="北京 杭州 杭州 北京" 返回 true
+
+	private boolean match(String pattern, String src) {
+		String[] srcArray = src.split(" ");
+		if (srcArray.length != pattern.length())
+			return false;
+
+		//存储src以空格分割后的各个字符
+		Set<String> srcSet = new HashSet<>();
+		//存储pattern与索引的对应关系
+		Map<Character, Integer> map = new HashMap<>();
+
+		for (int i = 0; i < pattern.length(); ++i) {
+			char p = pattern.charAt(i);
+			Integer index = map.get(p);
+			// 若是新的pattern
+			if (index == null) {
+				// 源串也应该是新的，否则不匹配
+				if (srcSet.contains(srcArray[i]))
+					return false;
+
+				map.put(p, i);
+				srcSet.add(srcArray[i]);
+			} else if (!srcArray[i].equals(srcArray[index])) // 若pattern重复，源串也应该与pattern重复的那个索引上的源串一致，否则不匹配
+				return false;
+		}
+		return true;
+	}
