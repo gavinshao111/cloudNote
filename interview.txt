@@ -266,3 +266,7 @@ pattern = "baab", str="北京 杭州 杭州 北京" 返回 true
 		}
 		return true;
 	}
+
+innoDB mysys 区别
+jdk的线程安全Map HashMap和concurrentHashMap 数据结构区别
+spring bean加载过程  循环引用

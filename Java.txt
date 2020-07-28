@@ -226,7 +226,7 @@
       ·缓存淘汰：当实际内存超限时，提供的淘汰策略
         默认no eviction（禁止驱逐数据，只允许读），针对设有过期时间的：volatile-lru（最近使用距今最远），volatile-ttl（寿命最短），volatile-random（随机淘汰），针对所有的：allkeys-lru，allkeys-random
       ·分布式锁：使用setnx命令，只当key不存在时成功，设置过期时间以防止死锁；基于redission自带可重入锁
-      ·集群方案：
+      ·集群方案：？？？？？
          a. 主从：主从复制不会阻塞master，slave为只读
          b. cluster：把n个槽（slot）分摊给m个node，根据key进行散列（hash），分配到slot中。当某个node挂了，需要重新分摊slot，其中的key也要迁移。解决：每个node可以再搭主从结构，当master挂了选举一个slave顶上，
             提高cluster可用性。比普通的主从方案提高了IO并发能力。
