@@ -117,6 +117,19 @@
 
 三、SpringBoot
 
+ ·spring bean加载过程：实例化，属性注入，初始化
+   获取BeanName：对传入的 name 进行解析，转化为可以从 Map 中获取到 BeanDefinition 的 bean name
+   合并Bean定义
+   实例化：使用构造或者工厂方法创建 Bean 实例
+   属性填充：寻找并且注入依赖，依赖的 Bean 还会调用 getBean 方法获取
+   初始化：调用自定义的初始化方法
+   获取最终的Bean
+ ·spring bean生命周期：构造，调用初始化前方法，调用初始化方法，调初始化后方法，应用程序使用，销毁。
+ ·单例模式的设值循环依赖：
+   提前暴露创建中的单例。三级缓存：1.单例缓存，存储已经实例化完成的单例 2.生产单例的工厂的缓存，存储工厂 3.提前暴露的单例缓存，这时候的单例刚刚创建完，但还会注入依赖
+   A包含属性B，B包含属性C，C包含属性A。A构造完成开始属性注入时，已经分配好内存了，可以被C引用了。
+
+
  ·优点：约定大于配置
   1. 简化配置：无需 XML 配置文件，能自动扫描包路径装载并注入对象，并能做到根据 classpath 下的 jar 包自动配置；启动器(starter)自动依赖其他组件，简少了maven的配置
   2. 独立运行（内嵌容器），
@@ -326,6 +339,7 @@ JVM调优总结 https://www.cnblogs.com/andy-zhou/p/5327288.html
 SpringBoot常见面试问题 https://blog.csdn.net/zhoushimiao1990/article/details/99713372
 Spring Boot 面试，一个问题就干趴下了！ https://zhuanlan.zhihu.com/p/61028032
 spring boot 面试题详解 https://www.cnblogs.com/lingboweifu/p/11797926.html
+图文并茂，揭秘 Spring 的 Bean 的加载过程 https://www.jianshu.com/p/9ea61d204559
 
 MySQL中的分区是什么？为什么要分区？有什么好处？怎么进行分区？ https://blog.csdn.net/jiang7701037/article/details/81839899
 MySQL性能优化(五)：分表 https://blog.csdn.net/vbirdbest/article/details/81084182

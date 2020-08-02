@@ -267,6 +267,18 @@ pattern = "baab", str="北京 杭州 杭州 北京" 返回 true
 		return true;
 	}
 
-innoDB mysys 区别
-jdk的线程安全Map HashMap和concurrentHashMap 数据结构区别
-spring bean加载过程  循环引用
+
+innoDB myisam 区别
+    1. InnoDB支持事务，外键；MyISAM不支持
+    2. innoDB是聚集索引，必须有主键；MyISAM非聚集索引，不必须有索引
+    3. innodb查询行数（select * from table）需要全表扫描，MyISAM保存了行数变量
+    4. InnoDB 最小的锁粒度是行锁，MyISAM 最小的锁粒度是表锁。一个更新语句会锁住整张表，导致其他查询和更新都会被阻塞，因此并发访问受限
+
+jdk的线程安全Map: hashtable,ConcurrentHashMap
+
+HashMap和concurrentHashMap 数据结构区别(concurrentHashMap 在1.8以前是使用锁分段技术实现，将数据使用很多Segment存储，每个Segment由数组+链表组成，上锁只在Segment内)
+
+spring bean加载过程
+    1
+
+循环引用。
