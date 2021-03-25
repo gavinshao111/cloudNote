@@ -1,3 +1,12 @@
+Java基础
+ 1. 类可以实现多个接口，但是只能继承一个抽象类
+ 2. synchronized关键字和ReenTrantLock
+  同：都是可重入锁
+  异： 1. 异常时，sync自动释放锁；Lock必须在finally手动释放；
+      2. lock可以尝试锁，带超时阻塞锁，可被打断锁（lockInterruptibly）
+      3. sync非公平锁，lock默认非公平，可以在构造时指定为公平锁
+
+
 一、集合
   1. hash
     ·概念：一种将任意长度的消息压缩到某一固定长度的消息摘要的函数。
@@ -44,7 +53,21 @@
 二、 JVM相关
 
  1. 垃圾回收：
+ gc在什么时候对哪些对象做了什么操作。
+ who：使用可达性算法，从系统根节点起，遍历出所有未被引用的对象进行第一次标记；
+      调用 finalize（若对象override了这个方法，可在此方法中重新与根节点建立引用关系避免回收）；
+      再次从根节点遍历出未引用的对象，回收。
+ when：当Eden区满了：minorGC；当年老区满了：fullGC。
+ what：分代垃圾回收
+   年轻代进行复制清理：
+   1. MinorGC时，将Eden存活对象复制到s1，重复此循环；
+   2. 当s1满时，s1存活对象（o1）复制到s2，Eden区存活对象(o2)复制到s2。此后Eden满时，都复制到s2，重复此循环
+   3. 当s2满时，将o1复制到年老区，o2复制到s1区。重复1，2，3循环
+   年老代进行标记清理：
+   4. 当年老区满时，触发FullGC
 
+以下为可选：
+{
   a. 算法：
    按策略分：引用计数，标记-清除，复制，标记-整理
    按系统线程分：
@@ -59,25 +82,28 @@
    ·年老代：过小了，会造成内存碎片、高回收频率以及应用暂停；过大会使GC时间过长
    ·持久代（Permanent）：存放的是Java类的类信息
    GC时，存活对象流转流程：程序产生对象先在Eden区，Eden区满即会触发MinorGC
-   1. MinorGC时，将Eden存活对象复制到s1，重复此循环；
-   2. 当s1满时，s1存活对象（o1）复制到s2，Eden区存活对象(o2)复制到s2。此后Eden满时，都复制到s2，重复此循环
-   3. 当s2满时，将o1复制到年老区，o2复制到s1区。重复1，2，3循环
-   4. 当年老区满时，触发FullGC
 
   d. G1增量回收，将堆分成很多Region来进行内存管理。步骤：
     1、初始标记（它标记了从GC Root开始直接可达的对象）
     2、并发标记（从GC Roots开始对堆中对象进行可达性分析，找出存活对象）
     3、最终标记（标记那些在并发标记阶段发生变化的对象，将被回收）
     4、筛选回收（首先对各个Region的回收价值和成本进行排序，根据用户所期待的GC停顿时间指定回收计划，回收一部分Region）
+}
 
  2. 调优
+  jstack 查看堆栈
+  jmap 输出所有内存中的对象，种类，数量
+  jstat jvm统计监测工具。如 jstat -gc 监测垃圾回收情况
+
   a. 参数：
    ·-Xms:初始堆大小
    ·-Xmx:最大堆大小
-   ·-XX:NewRatio=n:设置年轻代和年老代的比值
+   ·-XX:NewRatio=n:年轻代/年老代比值
    ·-Xmn:年轻代大小
-   ·-XX:SurvivorRatio：新生代中Eden区域与Survivor区域的容量比值，默认值为8
+   ·-XX:SurvivorRatio：Eden/Survivor比值，默认值为8
    ·-Xss:分配给单个线程的空间
+
+可选{
    ·-XX:PermSize：设置永久代(perm gen)初始值
    ·-XX:MaxPermSize：设置持久代最大值
   b. 策略：减少GC的频率和Full GC的次数
@@ -107,6 +133,7 @@
    ·定义：当某个ClassLoader需要加载类时，先委托父类加载器（parent classloader，若不存在，则默认使用启动类加载器作为父类加载器）完成，若无法加载再自己去加载
    ·原因：比如要加载java.lang.Object，若由不同的classloader自行加载，则加载后的类不是同一个类（比如用户编写同名类放在classpath中），因此将类加载任务往上抛给顶层classloader（启动类加载器），加载出来的类是相同的。
    ·模型（各个类加载器层级关系，Composition组合）：User -> System -> Extension -> Bootstrap
+}
 
  5. volatile：JVM保证了每次读变量都从内存中读而非cpu缓存；保证此变量对所有的线程的可见性；禁止指令重排序优化
 
@@ -134,7 +161,7 @@
   1. 简化配置：无需 XML 配置文件，能自动扫描包路径装载并注入对象，并能做到根据 classpath 下的 jar 包自动配置；启动器(starter)自动依赖其他组件，简少了maven的配置
   2. 独立运行（内嵌容器），
   3. 应用监控（引入spring-boot-starter-actuator，访问/health查看健康状态）
-
+optional{
  ·基本工作原理：启动时，按约定读取各个Starter的配置信息，对资源进行初始化，并注入到Spring容器中。这样容器启动后，就已经准备好了一切资源，直接注入对应Bean即可使用
 
  ·自动配置原理：添加@SpringBootApplication或者@EnableAutoConfiguration，会自动去maven读取starter中的配置信息（META-INF/spring.factories），该文件包含了所有需要的bean
@@ -147,7 +174,7 @@
 
  ·常见问题
   1. 跨域：HTTP请求时必须遵守同源策略，否则就是跨域。解决方案：前后端分离的框架下，前端使用nodejs中转请求地址；controller上加@CrossOrigin
-
+}
 
 四、设计模式
   ·构造器模式：
@@ -161,6 +188,7 @@
         public A(int a, int b) {...}
         public A(int a, int c) {...} // 与上个构造函数矛盾
         public A(int a) {...}
+
     }
     当属性比较多时，不仅写起来麻烦，而且若出现同类型的可选字段，将无法重载。因此可以定义一个内部静态类，用来构造A
     public static class Builder {
@@ -182,11 +210,15 @@
   ·工厂模式：定义一个创建对象的接口，让其子类自己决定实例化哪一个工厂类，这样可使其创建过程延迟到子类进行
   ·单例模式：
   ·代理模式：结构型模式，一个类代表另一个类的功能，若直接访问会给使用者或者系统结构带来很多麻烦，在访问此对象时加上一个对此对象的访问层（代理）。如hibernate
-  ·策略：？ 行为型模式，将不同的算法分别封装，避免使用多重条件判断
+  ·策略：行为型模式，context类有一个策略接口，赋予不同的策略实现类，就可以动态改变context的执行策略
+  ·观察者：当对象间存在一对多关系时，则使用观察者模式（Observer Pattern）。比如，当一个对象被修改时，则会自动通知它的依赖对象
+  ·适配器：就是一种适配中间件，它存在于不匹配的二者之间，用于连接二者，将不匹配变得匹配。
+    类适配器：创建一个适配类去间接访问一个不符合规范的现有类
+    接口适配器：想要使用一个有过多方法的接口中的一部分方法，使用一个抽象类作为适配器实现此接口（仅置空），然后继承这个抽象类，重写想用的方法
+optional{
   ·外观：向现有的系统添加一个接口，来隐藏系统的复杂性
   ·桥接：抽象化与实现化解耦
-  ·观察者：当对象间存在一对多关系时，则使用观察者模式（Observer Pattern）。比如，当一个对象被修改时，则会自动通知它的依赖对象
-
+}
 
 五、数据库
     1. MySQL
@@ -232,6 +264,25 @@
         4. where：查找使用索引时，需要回表查询所需数据
         5. index condition：查找使用索引后，再次使用非索引条件，如a为索引，b非索引，where a=1 and b=2;
       ·主键索引与非主键索引区别：非主键索引的叶子节点存放的是主键的值，先查到主键值，然后再根据主键值查询到整行数据
+
+     ·锁：
+      1. 乐观锁读数据时不锁，适合读多写少，提高读效率；
+         悲观锁读数据时锁，适合写多读少，保证数据一致性
+
+      2. 读锁/共享锁：读时不锁，写时锁；
+         写锁/排他锁：读写都锁
+
+      3. 表锁：MyMyISAM和InnoDB无索引时使用，开销小，速度快，并发度低，不会死锁。
+         行锁：InnoDB有索引时使用，开销大，加锁慢，并发度高，易死锁。
+         页锁：介于两只之间。
+
+
+      ·innoDB myisam 区别
+            1. InnoDB支持事务，外键；MyISAM不支持
+            2. innoDB是聚集索引，必须有主键；MyISAM非聚集索引，不必须有索引
+            3. innodb查询行数（select * from table）需要全表扫描，MyISAM保存了行数变量
+            4. InnoDB 最小的锁粒度是行锁，MyISAM 最小的锁粒度是表锁，一个更新语句会锁住整张表，导致其他查询和更新都会被阻塞，因此并发访问受限
+
 
     2. redis
       ·持久化：RDB：定期保存快照到磁盘中；AOF：保存所有写命令到文件，重启时重新执行写命令重建数据。
@@ -302,6 +353,26 @@
       d. 关闭后释放所有资源
 
 
+1. 反射：把java类中的各种成分映射成一个个的Java对象，运行时获取一个类的属性和方法信息，并调用
+“Class”类的实例表示java中每个类/接口的属性
+获取方式：Objeck.getClass()；.class属性；Class.forName(String className)
+
+2. 线程池
+execute和submit的区别：
+	execute()：提交不需要返回值的任务
+	submit()：提交需要返回值的任务
+
+如何合理地选择
+	1、CachedThreadPool 用于并发执行大量短期的小任务，或者是负载较轻的服务器
+	2、FixedThreadPool 用于负载比较重的服务器，为了资源的合理利用，需要限制当前线程数量
+	3、SingleThreadExecutor 用于串行执行任务的场景，每个任务必须按顺序执行，不需要并发执行
+	4、ScheduledThreadPoolExecutor 用于需要多个后台线程执行周期任务，同时需要限制线程数量的场景
+	自定义线程池时，如果任务是 CPU 密集型（需要进行大量计算、处理），则应该配置尽量少的线程，比如 CPU 个数 + 1，这样可以避免出现每个线程都需要使用很长时间但是有太多线程争抢资源的情况；
+	如果任务是 IO密集型（主要时间都在 I/O，CPU 空闲时间比较多），则应该配置多一些线程，比如 CPU 数的两倍，这样可以更高地压榨 CPU。
+
+
+
+
 八、项目中遇到的问题：
     1. 在月初/底查询流量时，需要统计当月充值流量，由于数据库中时间与运行环境时间不一致，导致统计得到的当月充值流量错误。比如在8月1号1点查询当月充值流量，使用数据库内置函数curdate()可能会返回7月31号19点，这样查询出来的充值流量将为7月充值流量，产生bug。
 
@@ -335,6 +406,9 @@
 引用：
 JVM调优总结 https://www.cnblogs.com/andy-zhou/p/5327288.html
 几率大的JVM面试题（含答案） https://blog.csdn.net/Butterfly_resting/article/details/89705057
+面试官对java垃圾回收面试要求的整理 https://blog.csdn.net/qq_35666577/article/details/80415115
+finalize() https://blog.csdn.net/a4171175/article/details/90749839
+Java面试--垃圾回收机制(GC) https://blog.csdn.net/weixin_41835916/article/details/81530733
 
 SpringBoot常见面试问题 https://blog.csdn.net/zhoushimiao1990/article/details/99713372
 Spring Boot 面试，一个问题就干趴下了！ https://zhuanlan.zhihu.com/p/61028032
@@ -366,6 +440,9 @@ Java面试之http知识点（必问） https://www.cnblogs.com/it-tsz/p/11408668
 SSL双向认证以及证书的制作和使用 https://www.cnblogs.com/bekoma/p/4053000.html
 SSL/TLS 双向认证(一) -- SSL/TLS工作原理 https://blog.csdn.net/ustccw/article/details/76691248
 TCP四次挥手时的TIME_WAIT状态 https://blog.csdn.net/tuobicui6522/article/details/80379428
+
+Java笔试面试目录 https://blog.csdn.net/weixin_41835916/article/details/81413498
+数据库常用的锁有哪些 https://blog.csdn.net/Michaeles/article/details/86484385
 
 
  1. 集合，并发集合，集合原理 done
