@@ -1,0 +1,25 @@
+1. JVM中一个字节以下的整型数据会在JVM启动的时候加载进内存，除非用new Integer()显式的创建对象，否则都是同一个对象
+Integer i01 = 59;
+int i02 = 59;
+Integer i03 =Integer.valueOf(59);
+Integer i04 = new Integer(59);
+以下输出结果为false的是：C
+System.out.println(i01 == i02);
+System.out.println(i01 == i03);
+System.out.println(i03 == i04);
+System.out.println(i02 == i04);
+
+2. JVM内存参数
+-Xmx10240m -Xms10240m -Xmn5120m -XXSurvivorRatio=3
+,其最小内存值和Survivor区总大小分别是 10240m，2048m
+
+3. cpu负载高可能的情况
+ a. 内存溢出导致频繁gc
+    qw
+4. Java性能问题排查方式
+ a. free/top命令查看剩余内存、cpu使用率
+ b. jstack查看堆栈
+ c. jstat -gcutil 查看gc统计信息
+S0（s0大小） S1（s1大小） E（eden区大小） O（老年代大小） M（方法区大小） CCS（压缩类） YGC（年轻代gc次数） YGCT（年轻代gc耗时） FGC（fullGc次数） FGCT（fullGc总耗时） GCT（gc总耗时）
+13.56       0.00        77.68          54.09  97.62  95.35   9284   42.891     3    0.287   43.178
+ d. vmstat查看用户态（us）和内核态（sy）各自的cpu占用率

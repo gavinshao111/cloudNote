@@ -100,7 +100,7 @@ Java基础
    ·-Xmx:最大堆大小
    ·-XX:NewRatio=n:年轻代/年老代比值
    ·-Xmn:年轻代大小
-   ·-XX:SurvivorRatio：Eden/Survivor比值，默认值为8
+   ·-XX:SurvivorRatio：Eden/Survivor比值，默认值为8（该值为其中一个Survivor的比值，两个Survivor占总大小=1/(SurvivorRatio+2)*2）
    ·-Xss:分配给单个线程的空间
 
 可选{
